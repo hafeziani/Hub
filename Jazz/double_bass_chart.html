@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Double Bass — Positions, Notes, Scales, Modes &amp; Intervals</title>
+<style>
+  /* ========== COLOR TOKENS ========== */
+  /* Dark theme is the default; the media query below overrides these for light mode. */
+  :root {
+    --bg: #14161c;
+    --panel: #1c1f27;
+    --panel-border: #2b2f3a;
+    --text: #e8eaef;
+    --muted: #9aa1b2;
+    --accent: #d9a441;
+    --accent-soft: #3a3120;
+    --string-line: #565c6e;
+    --fret-line: #3a3f4c;
+    --nut: #e8eaef;
+    --open-dot: #6c7386;
+    --root-dot: #d9a441;
+    --natural-dot: #4d84c9;
+    --dim-dot: #3a3f4c;
+    --chord-i: #d9a441;
+    --chord-iv: #4d84c9;
+    --chord-v: #c9604a;
+  }
+  /* Light-mode overrides for the same token names above */
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f5f4f0;
+      --panel: #ffffff;
+      --panel-border: #e1ded4;
+      --text: #232323;
+      --muted: #6b6b6b;
+      --accent: #b5791a;
+      --accent-soft: #f3e6c9;
+      --string-line: #999;
+      --fret-line: #ccc;
+      --nut: #232323;
+      --open-dot: #8a8a8a;
+      --root-dot: #b5791a;
+      --natural-dot: #2f6bb0;
+      --dim-dot: #ddd8cb;
+      --chord-i: #b5791a;
+      --chord-iv: #2f6bb0;
+      --chord-v: #ab4a34;
+    }
+  }
+  * { box-sizing: border-box; }
+  /* ========== BASE PAGE LAYOUT ========== */
+  /* Sidenav + main content sit side by side; .wrap is the centered content column. */
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    display: flex;
+    align-items: flex-start;
+  }
+  .wrap { flex: 1; min-width: 0; max-width: 980px; margin: 0 auto; padding: 40px 24px 60px; }
+
+  /* ========== LEFT NAV PANEL ========== */
+  /* Sticky left-hand nav: stays pinned to the viewport while the content column scrolls;
+     the active link is kept in sync with scroll position by the IntersectionObserver
+     scrollspy near the bottom of the script block. */
+  .sidenav {
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    height: 100vh;
+    overflow-y: auto;
+    flex-shrink: 0;
+    width: 210px;
+    background: var(--panel);
+    border-right: 1px solid var(--panel-border);
+    padding: 24px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .sidenav-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    padding: 0 10px 14px;
+  }
+  .sidenav a {
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 8px 10px;
+    border-radius: 8px;
+    transition: background .12s, color .12s;
+  }
+  .sidenav a:hover { color: var(--text); background: var(--bg); }
+  .sidenav a.active { color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+
+  /* Below 860px there's no room for a side column: the nav becomes a static,
+     horizontally-scrollable bar stacked above the content instead of a sticky sidebar. */
+  @media (max-width: 860px) {
+    body { flex-direction: column; }
+    .sidenav {
+      position: static;
+      width: 100%;
+      height: auto;
+      flex-direction: row;
+      overflow-x: auto;
+      overflow-y: visible;
+      border-right: none;
+      border-bottom: 1px solid var(--panel-border);
+      gap: 6px;
+      padding: 14px 16px;
+    }
+    .sidenav-title { display: none; }
+    .sidenav a { flex-shrink: 0; white-space: nowrap; }
+    .wrap { max-width: 100%; }
+  }
+  /* ========== PAGE HEADER + SHARED PANEL CHROME ========== */
+  /* h1/subtitle are the page banner; .panel is the rounded card used for every section below. */
+  h1 {
+    font-size: 26px;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 18px;
+  }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 14px;
+    padding: 28px 24px;
+    margin-bottom: 28px;
+    scroll-margin-top: 20px;
+  }
+  .panel h2 {
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin: 0 0 20px;
+    font-weight: 600;
+  }
+  .panel p.desc {
+    font-size: 13.5px;
+    color: var(--muted);
+    margin: -10px 0 20px;
+    line-height: 1.5;
+  }
+
+  /* Fingerboard diagram */
+  .board-scroll { overflow-x: auto; padding-bottom: 8px; }
+  .board {
+    position: relative;
+    min-width: 900px;
+    padding: 30px 16px 10px 60px;
+  }
+  .fret-numbers {
+    display: grid;
+    grid-template-columns: repeat(13, 1fr);
+    margin-bottom: 6px;
+    padding-left: 0;
+  }
+  .fret-numbers span {
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .strings {
+    position: relative;
+    border-left: 5px solid var(--nut);
+    padding-left: 0;
+  }
+  .string-row {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(13, 1fr);
+    height: 46px;
+    align-items: center;
+    border-top: 1px solid var(--fret-line);
+  }
+  .string-row:last-child { border-bottom: 1px solid var(--fret-line); }
+  .string-row::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; top: 50%;
+    height: 2px;
+    background: var(--string-line);
+    transform: translateY(-1px);
+  }
+  .string-label {
+    position: absolute;
+    left: -46px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--accent);
+    width: 30px;
+    text-align: center;
+  }
+  .cell {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    z-index: 2;
+  }
+  .fret-div {
+    position: absolute;
+    top: 0; bottom: 0; right: 0;
+    width: 1px;
+    background: var(--fret-line);
+  }
+  .note {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    background: var(--panel);
+    border: 2px solid var(--string-line);
+    color: var(--text);
+  }
+  .note.open {
+    background: transparent;
+    border: 2px solid var(--open-dot);
+    color: var(--muted);
+  }
+  .note.root {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #1a1a1a;
+  }
+  .note.natural {
+    background: var(--natural-dot);
+    border-color: var(--natural-dot);
+    color: #fff;
+  }
+  .note.scale {
+    width: 36px;
+    height: 36px;
+    flex-direction: column;
+    gap: 0;
+    background: var(--natural-dot);
+    border-color: var(--natural-dot);
+    color: #fff;
+    font-size: 11px;
+    line-height: 1.05;
+  }
+  .note.scale.is-root {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #1a1a1a;
+  }
+  .note.scale span.deg {
+    font-size: 8px;
+    font-weight: 600;
+    opacity: 0.85;
+  }
+  .note.dim {
+    width: 8px;
+    height: 8px;
+    background: var(--dim-dot);
+    border: none;
+  }
+
+  .marker-row {
+    display: grid;
+    grid-template-columns: repeat(13, 1fr);
+    margin-top: 6px;
+  }
+  .marker-row span {
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .marker-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--fret-line);
+  }
+
+  .legend {
+    display: flex;
+    gap: 22px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .legend-item { display: flex; align-items: center; gap: 8px; }
+  .legend-dot {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+  th, td {
+    text-align: center;
+    padding: 8px 6px;
+    border-bottom: 1px solid var(--panel-border);
+    font-variant-numeric: tabular-nums;
+  }
+  th {
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  td.string-name, td.name-cell {
+    font-weight: 700;
+    color: var(--accent);
+    text-align: left;
+    padding-left: 4px;
+  }
+  td.left { text-align: left; }
+  td.open-note { color: var(--muted); font-style: italic; }
+
+  /* Two-column layout used by the Quick Reference panel's open-strings / harmonics lists */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  @media (max-width: 720px) {
+    .two-col { grid-template-columns: 1fr; }
+  }
+  .note-block h3 {
+    font-size: 13px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 10px;
+  }
+  ul.plain {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  ul.plain li {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13.5px;
+    border-bottom: 1px dashed var(--panel-border);
+    padding-bottom: 6px;
+  }
+  ul.plain li span:first-child { color: var(--muted); }
+  ul.plain li span:last-child { font-weight: 600; }
+
+  /* Explorer controls */
+  .explorer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+  .explorer label {
+    font-size: 12.5px;
+    color: var(--muted);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .explorer select {
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 13.5px;
+    min-width: 170px;
+  }
+  .result-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    align-items: center;
+    background: var(--bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+    font-size: 13.5px;
+  }
+  .result-strip .formula-tag {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 12.5px;
+  }
+  .result-strip .notes-list {
+    font-weight: 600;
+  }
+  .character-line {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: -6px;
+    margin-bottom: 18px;
+    line-height: 1.5;
+  }
+
+  /* Page footer note (enharmonic-spelling legend) */
+  footer {
+    color: var(--muted);
+    font-size: 12px;
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  /* Blues progression bar grid */
+  .blues-bars {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+  .blues-bar {
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    padding: 10px 8px 8px;
+    text-align: center;
+    background: var(--bg);
+    border-top: 3px solid var(--panel-border);
+  }
+  .blues-bar .bar-num {
+    font-size: 10px;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .blues-bar .bar-roman {
+    font-size: 15px;
+    font-weight: 700;
+  }
+  .blues-bar .bar-chord {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    margin-top: 2px;
+  }
+  .blues-bar.fn-I { border-top-color: var(--chord-i); }
+  .blues-bar.fn-I .bar-roman { color: var(--chord-i); }
+  .blues-bar.fn-IV { border-top-color: var(--chord-iv); }
+  .blues-bar.fn-IV .bar-roman { color: var(--chord-iv); }
+  .blues-bar.fn-V { border-top-color: var(--chord-v); }
+  .blues-bar.fn-V .bar-roman { color: var(--chord-v); }
+</style>
+</head>
+<body>
+<!-- Sticky left nav; links use data-target ids matched against panel ids by the scrollspy script -->
+<nav class="sidenav" id="sidenav">
+  <div class="sidenav-title">Double Bass Chart</div>
+  <a href="#board-panel" data-target="board-panel">Fingerboard</a>
+  <a href="#table-panel" data-target="table-panel">Note table</a>
+  <a href="#quickref-panel" data-target="quickref-panel">Quick reference</a>
+  <a href="#harmonics-panel" data-target="harmonics-panel">Natural harmonics</a>
+  <a href="#intervals-panel" data-target="intervals-panel">Intervals</a>
+  <a href="#scales-panel" data-target="scales-panel">Scales</a>
+  <a href="#blues-panel" data-target="blues-panel">Blues progression</a>
+  <a href="#modes-panel" data-target="modes-panel">Modes</a>
+</nav>
+<div class="wrap">
+  <h1>Double Bass — Position &amp; Note Chart</h1>
+  <p class="subtitle">4-string double bass, standard orchestral tuning E&ndash;A&ndash;D&ndash;G. Semitone map across the first octave (positions 0&ndash;12), plus interactive scale, mode, and interval reference.</p>
+
+  <!-- FINGERBOARD DIAGRAM -->
+  <div class="panel" id="board-panel">
+    <h2>Fingerboard Note Map</h2>
+    <div class="board-scroll">
+      <div class="board">
+        <div class="fret-numbers">
+          <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span>
+        </div>
+        <div class="strings" id="strings"></div>
+        <div class="marker-row">
+          <span></span><span></span><span></span><span class="marker-dot"></span><span></span><span class="marker-dot"></span><span></span><span class="marker-dot"></span><span></span><span></span><span class="marker-dot"></span><span></span><span class="marker-dot marker-dot"></span>
+        </div>
+      </div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><span class="legend-dot" style="border:2px solid var(--open-dot); background:transparent;"></span> Open string</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--accent);"></span> String's root note (octave)</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--natural-dot);"></span> Natural harmonic point (5th, 7th, 12th)</div>
+      <div class="legend-item">Numbers = semitones from the nut (equivalent to fret position)</div>
+    </div>
+  </div>
+
+  <!-- NOTE TABLE -->
+  <div class="panel" id="table-panel">
+    <h2>Note Table by String</h2>
+    <div style="overflow-x:auto;">
+    <table id="note-table">
+      <thead>
+        <tr>
+          <th>String</th>
+          <th>0 (open)</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th>
+        </tr>
+      </thead>
+      <tbody id="note-table-body"></tbody>
+    </table>
+    </div>
+  </div>
+
+  <!-- QUICK REFERENCE -->
+  <div class="panel" id="quickref-panel">
+    <h2>Quick Reference</h2>
+    <div class="two-col">
+      <div class="note-block">
+        <h3>Open Strings</h3>
+        <ul class="plain">
+          <li><span>4th string (thickest)</span><span>E</span></li>
+          <li><span>3rd string</span><span>A</span></li>
+          <li><span>2nd string</span><span>D</span></li>
+          <li><span>1st string (thinnest)</span><span>G</span></li>
+        </ul>
+      </div>
+      <div class="note-block">
+        <h3>Natural Harmonics (all strings)</h3>
+        <ul class="plain">
+          <li><span>12th semitone position</span><span>Octave (open + 12)</span></li>
+          <li><span>7th semitone position</span><span>Octave + a 5th</span></li>
+          <li><span>5th semitone position</span><span>Two octaves</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- NATURAL HARMONICS -->
+  <div class="panel" id="harmonics-panel">
+    <h2>Natural Harmonics</h2>
+    <p class="desc">
+      A natural harmonic is the bell-like, flute-y tone you get by touching a string lightly at an exact point
+      along its length &mdash; without pressing it to the fingerboard &mdash; instead of stopping it normally.
+      An open string vibrates at its fundamental pitch, but it's also quietly vibrating in halves, thirds,
+      quarters, and fifths at the same time (the harmonic series). Touching the string at one of those exact
+      division points damps out the fundamental and lets that overtone ring alone, producing a pure, ringing
+      pitch that's higher than &mdash; and different from &mdash; whatever note is normally at that fret.
+    </p>
+    <div style="overflow-x:auto; margin-bottom: 24px;">
+      <table>
+        <thead>
+          <tr>
+            <th style="text-align:left;">Touch Point</th>
+            <th>Harmonic</th>
+            <th>String Divided Into</th>
+            <th>Pitch Produced</th>
+            <th>E string</th>
+            <th>A string</th>
+            <th>D string</th>
+            <th>G string</th>
+          </tr>
+        </thead>
+        <tbody id="harmonics-table-body"></tbody>
+      </table>
+    </div>
+
+    <div class="board-scroll">
+      <div id="harmonics-board"></div>
+    </div>
+    <div class="legend" style="margin-top:16px;">
+      <div class="legend-item"><span class="legend-dot" style="background:var(--natural-dot);"></span> Natural harmonic node &mdash; label shows the pitch you hear, not the stopped note</div>
+      <div class="legend-item"><span class="legend-dot" style="border:2px solid var(--open-dot); background:transparent;"></span> Open string</div>
+    </div>
+
+    <p class="character-line" style="margin-top:20px;">
+      <strong style="color: var(--text);">Tuning trick:</strong> because the bass is tuned in perfect fourths,
+      the harmonic at position 5 on a string always matches the harmonic at position 7 on the next higher
+      string &mdash; e.g. the E string's position-5 harmonic and the A string's position-7 harmonic are the same
+      pitch (E). Playing the two together and listening for beats is a quick way to check the bass is in tune.
+      There's also a mirror-image node around position 19 (past this diagram) that reproduces the same pitch
+      as position 7 &mdash; useful once you're working in upper/thumb position.
+    </p>
+  </div>
+
+  <!-- INTERVALS -->
+  <div class="panel" id="intervals-panel">
+    <h2>Intervals</h2>
+    <p class="desc">The distance between two notes, measured in semitones. Every scale and mode below is just a chosen set of intervals stacked from a root.</p>
+    <div style="overflow-x:auto; margin-bottom: 24px;">
+      <table>
+        <thead>
+          <tr><th>Semitones</th><th>Interval Name</th><th>Short</th><th>Example from C</th></tr>
+        </thead>
+        <tbody id="interval-table-body"></tbody>
+      </table>
+    </div>
+
+    <h2 style="margin-top: 6px;">Interval Finder</h2>
+    <div class="explorer">
+      <label>Root note
+        <select id="interval-root"></select>
+      </label>
+      <label>Interval
+        <select id="interval-select"></select>
+      </label>
+    </div>
+    <div class="result-strip" id="interval-result"></div>
+    <div class="board-scroll">
+      <div id="interval-board"></div>
+    </div>
+  </div>
+
+  <!-- SCALES -->
+  <div class="panel" id="scales-panel">
+    <h2>Scales</h2>
+    <p class="desc">Pick a root and a scale to see its formula, note spelling, and every matching note across the fingerboard. Root notes are gold; other scale tones are blue with their scale degree underneath.</p>
+    <div class="explorer">
+      <label>Root note
+        <select id="scale-root"></select>
+      </label>
+      <label>Scale
+        <select id="scale-select"></select>
+      </label>
+    </div>
+    <div class="result-strip" id="scale-result"></div>
+    <div class="board-scroll">
+      <div id="scale-board"></div>
+    </div>
+  </div>
+
+  <!-- BLUES CHORD PROGRESSION -->
+  <div class="panel" id="blues-panel">
+    <h2>Blues Chord Progression</h2>
+    <p class="desc">The 12-bar blues is built from just three chords &mdash; the I, IV, and V of the key &mdash; arranged in a few standard patterns. Pick a root below to transpose the whole form; the fingerboard highlights exactly where those three chord roots sit so you can walk between them.</p>
+
+    <div style="overflow-x:auto; margin-bottom: 24px;">
+      <table>
+        <thead>
+          <tr><th style="text-align:left;">Variation</th><th>Bars 1&ndash;4</th><th>Bars 5&ndash;8</th><th>Bars 9&ndash;12</th></tr>
+        </thead>
+        <tbody id="blues-overview-body"></tbody>
+      </table>
+    </div>
+
+    <h2 style="margin-top: 6px;">Blues Explorer</h2>
+    <div class="explorer">
+      <label>Root note
+        <select id="blues-root"></select>
+      </label>
+      <label>Variation
+        <select id="blues-variation"></select>
+      </label>
+    </div>
+    <div class="result-strip" id="blues-result"></div>
+    <div class="blues-bars" id="blues-bars"></div>
+    <div class="legend" style="margin-bottom: 16px;">
+      <div class="legend-item"><span class="legend-dot" style="background:var(--chord-i);"></span> I &mdash; tonic</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--chord-iv);"></span> IV &mdash; subdominant</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--chord-v);"></span> V &mdash; dominant</div>
+    </div>
+    <p class="character-line" id="blues-description"></p>
+    <div class="board-scroll">
+      <div id="blues-board"></div>
+    </div>
+  </div>
+
+  <!-- MODES -->
+  <div class="panel" id="modes-panel">
+    <h2>Modes of the Major Scale</h2>
+    <p class="desc">Each mode uses the exact same 7 notes as a major scale, just starting from a different degree — which shifts the pattern of whole and half steps and gives each mode its own character.</p>
+    <div style="overflow-x:auto; margin-bottom: 24px;">
+      <table>
+        <thead>
+          <tr><th style="text-align:left;">Mode</th><th>Starts on Major Scale Degree</th><th>Formula</th><th>Character</th></tr>
+        </thead>
+        <tbody id="mode-table-body"></tbody>
+      </table>
+    </div>
+
+    <h2 style="margin-top: 6px;">Mode Explorer</h2>
+    <div class="explorer">
+      <label>Root note
+        <select id="mode-root"></select>
+      </label>
+      <label>Mode
+        <select id="mode-select"></select>
+      </label>
+    </div>
+    <div class="result-strip" id="mode-result"></div>
+    <p class="character-line" id="mode-character"></p>
+    <div class="board-scroll">
+      <div id="mode-board"></div>
+    </div>
+  </div>
+
+  <footer>Semitone position 12 = one octave above the open string. Sharps shown throughout (enharmonic flats: F&#9839;/G&#9837;, G&#9839;/A&#9837;, A&#9839;/B&#9837;, C&#9839;/D&#9837;, D&#9839;/E&#9837;). "b" in a formula = flat, "#" = sharp, relative to the major scale degree.</footer>
+</div>
+
+<script>
+/* ---------- Core note data ---------- */
+// All 12 pitch classes in chromatic order (sharps only); array index doubles as a 0-11 pitch number.
+const CHROMATIC = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+// The four bass strings, thinnest/highest first, with their open-string pitch.
+const STRINGS = [
+  { label: "G", root: "G" },
+  { label: "D", root: "D" },
+  { label: "A", root: "A" },
+  { label: "E", root: "E" },
+];
+// Fret-equivalent positions (from the open string) where natural harmonics ring: 5th, 7th, 12th.
+const HARMONIC_POSITIONS = [5, 7, 12];
+
+// Chromatic index (0-11) of a note name.
+function idx(note) { return CHROMATIC.indexOf(note); }
+// The 13 notes (open string + frets 1-12) starting from openNote.
+function notesFromOpen(openNote) {
+  const start = idx(openNote);
+  const out = [];
+  for (let i = 0; i <= 12; i++) out.push(CHROMATIC[(start + i) % 12]);
+  return out;
+}
+
+/* ---------- Correct enharmonic spelling (each scale degree gets its own letter) ---------- */
+const LETTER_ORDER = ["C","D","E","F","G","A","B"];
+const LETTER_NATURAL = { C:0, D:2, E:4, F:5, G:7, A:9, B:11 };
+
+function numeralFromDegree(label) {
+  return parseInt(label.replace(/[#b]/g, ""), 10);
+}
+
+// Spell the note that is `offsetSemitones` above rootNote, using the letter
+// that is `numeral` scale-steps above the root's letter (so e.g. a "b3" above
+// C is forced to use the letter E — giving Eb, never the enharmonic D#).
+function spellNote(rootNote, offsetSemitones, numeral) {
+  const rootLetter = rootNote[0];
+  const rootPitch = idx(rootNote);
+  const targetPitch = ((rootPitch + offsetSemitones) % 12 + 12) % 12;
+  const startIdx = LETTER_ORDER.indexOf(rootLetter);
+  const targetLetter = LETTER_ORDER[(startIdx + (numeral - 1)) % 7];
+  const targetNatural = LETTER_NATURAL[targetLetter];
+  let diff = ((targetPitch - targetNatural) % 12 + 12) % 12;
+  if (diff > 6) diff -= 12; // fold into -6..6, accidentals should land in -2..2
+  const accidental = diff === 0 ? "" : diff === 1 ? "#" : diff === -1 ? "b" : diff === 2 ? "##" : diff === -2 ? "bb" : "";
+  return targetLetter + accidental;
+}
+
+/* ---------- Main static fingerboard + table ---------- */
+const boardEl = document.getElementById("strings");
+const tbody = document.getElementById("note-table-body");
+
+STRINGS.forEach(s => {
+  const notes = notesFromOpen(s.root);
+  const row = document.createElement("div");
+  row.className = "string-row";
+  const label = document.createElement("div");
+  label.className = "string-label";
+  label.textContent = s.label;
+  row.appendChild(label);
+
+  notes.forEach((note, i) => {
+    const cell = document.createElement("div");
+    cell.className = "cell";
+    if (i < 12) {
+      const div = document.createElement("div");
+      div.className = "fret-div";
+      cell.appendChild(div);
+    }
+    const dot = document.createElement("div");
+    let cls = "note";
+    if (i === 0) cls += " open";
+    else if (note === s.root) cls += " root";
+    else if (HARMONIC_POSITIONS.includes(i)) cls += " natural";
+    dot.className = cls;
+    dot.textContent = note;
+    cell.appendChild(dot);
+    row.appendChild(cell);
+  });
+  boardEl.appendChild(row);
+
+  const tr = document.createElement("tr");
+  const nameTd = document.createElement("td");
+  nameTd.className = "string-name";
+  nameTd.textContent = s.label + " string";
+  tr.appendChild(nameTd);
+  notes.forEach((note, i) => {
+    const td = document.createElement("td");
+    if (i === 0) td.className = "open-note";
+    td.textContent = note;
+    tr.appendChild(td);
+  });
+  tbody.appendChild(tr);
+});
+
+/* ---------- NATURAL HARMONICS ---------- */
+// The natural-harmonic touch points shown in the table/diagram: fret-equivalent position,
+// harmonic number, semitones above the open string, string-length fraction, and interval name.
+const HARMONIC_NODES = [
+  { pos: 4, harm: 5, semitones: 28, division: "1/5 of string length", intervalLabel: "2 octaves + Major 3rd" },
+  { pos: 5, harm: 4, semitones: 24, division: "1/4 of string length", intervalLabel: "2 octaves" },
+  { pos: 7, harm: 3, semitones: 19, division: "1/3 of string length", intervalLabel: "Octave + Perfect 5th" },
+  { pos: 12, harm: 2, semitones: 12, division: "1/2 of string length", intervalLabel: "Octave" },
+];
+const HARMONIC_NODE_MAP = Object.fromEntries(HARMONIC_NODES.map(n => [n.pos, n]));
+
+const harmonicsTableBody = document.getElementById("harmonics-table-body");
+HARMONIC_NODES.slice().sort((a, b) => a.pos - b.pos).forEach(n => {
+  const tr = document.createElement("tr");
+  const pitches = STRINGS.slice().reverse().reduce((acc, s) => {
+    acc[s.label] = CHROMATIC[(idx(s.root) + n.semitones) % 12];
+    return acc;
+  }, {});
+  tr.innerHTML = `<td class="left">Position ${n.pos}</td><td>${n.harm}${n.harm === 2 ? "nd" : n.harm === 3 ? "rd" : "th"}</td><td>${n.division}</td><td>${n.intervalLabel}</td><td>${pitches["E"]}</td><td>${pitches["A"]}</td><td>${pitches["D"]}</td><td>${pitches["G"]}</td>`;
+  harmonicsTableBody.appendChild(tr);
+});
+// Extra footnote row for the quieter alternate node of the 5th harmonic
+(() => {
+  const tr = document.createElement("tr");
+  const semis = 28;
+  const pitches = STRINGS.reduce((acc, s) => { acc[s.label] = CHROMATIC[(idx(s.root) + semis) % 12]; return acc; }, {});
+  tr.style.opacity = "0.7";
+  tr.innerHTML = `<td class="left">Position 9 (alt., quieter)</td><td>5th</td><td>2/5 of string length</td><td>2 octaves + Major 3rd</td><td>${pitches["E"]}</td><td>${pitches["A"]}</td><td>${pitches["D"]}</td><td>${pitches["G"]}</td>`;
+  harmonicsTableBody.appendChild(tr);
+})();
+
+// Render the natural-harmonics fingerboard diagram: each harmonic node shows the pitch it
+// produces (not the stopped note) on every string; other positions are dimmed placeholders.
+function buildHarmonicsBoard(containerId) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = "";
+  const wrap = document.createElement("div");
+  wrap.className = "board";
+
+  const fretNums = document.createElement("div");
+  fretNums.className = "fret-numbers";
+  for (let i = 0; i <= 12; i++) {
+    const span = document.createElement("span");
+    span.textContent = i;
+    fretNums.appendChild(span);
+  }
+  wrap.appendChild(fretNums);
+
+  const stringsWrap = document.createElement("div");
+  stringsWrap.className = "strings";
+
+  STRINGS.forEach(s => {
+    const row = document.createElement("div");
+    row.className = "string-row";
+    const label = document.createElement("div");
+    label.className = "string-label";
+    label.textContent = s.label;
+    row.appendChild(label);
+
+    for (let i = 0; i <= 12; i++) {
+      const cell = document.createElement("div");
+      cell.className = "cell";
+      if (i < 12) {
+        const div = document.createElement("div");
+        div.className = "fret-div";
+        cell.appendChild(div);
+      }
+      const node = HARMONIC_NODE_MAP[i];
+      const dot = document.createElement("div");
+      if (node) {
+        const pitch = CHROMATIC[(idx(s.root) + node.semitones) % 12];
+        dot.className = "note scale";
+        dot.innerHTML = `<div>${pitch}</div><span class="deg">H${node.harm}</span>`;
+      } else if (i === 0) {
+        dot.className = "note open";
+        dot.textContent = s.root;
+      } else {
+        dot.className = "note dim";
+      }
+      cell.appendChild(dot);
+      row.appendChild(cell);
+    }
+    stringsWrap.appendChild(row);
+  });
+
+  wrap.appendChild(stringsWrap);
+  container.appendChild(wrap);
+}
+
+/* ---------- Shared: build a small fingerboard highlighting a root + a set of scale degrees ---------- */
+// members: array of { offset, numeral, label } — offset in semitones from root,
+// numeral = scale-step number (1-7) used to pick the correct letter name, label = degree text (e.g. "b3").
+function buildScaleBoard(container, rootNote, members) {
+  container.innerHTML = "";
+  const wrap = document.createElement("div");
+  wrap.className = "board";
+
+  const fretNums = document.createElement("div");
+  fretNums.className = "fret-numbers";
+  for (let i = 0; i <= 12; i++) {
+    const span = document.createElement("span");
+    span.textContent = i;
+    fretNums.appendChild(span);
+  }
+  wrap.appendChild(fretNums);
+
+  const stringsWrap = document.createElement("div");
+  stringsWrap.className = "strings";
+
+  const rootIdx = idx(rootNote);
+  // Pre-spell each scale tone once (correct letter per degree), keyed by offset.
+  const spelled = {};
+  members.forEach(m => { spelled[m.offset] = { note: spellNote(rootNote, m.offset, m.numeral), label: m.label }; });
+
+  STRINGS.forEach(s => {
+    const notes = notesFromOpen(s.root);
+    const row = document.createElement("div");
+    row.className = "string-row";
+    const label = document.createElement("div");
+    label.className = "string-label";
+    label.textContent = s.label;
+    row.appendChild(label);
+
+    notes.forEach((note, i) => {
+      const cell = document.createElement("div");
+      cell.className = "cell";
+      if (i < 12) {
+        const div = document.createElement("div");
+        div.className = "fret-div";
+        cell.appendChild(div);
+      }
+      const offsetFromRoot = ((idx(note) - rootIdx) % 12 + 12) % 12;
+      const dot = document.createElement("div");
+      const match = spelled[offsetFromRoot];
+
+      if (offsetFromRoot === 0) {
+        dot.className = "note scale is-root";
+        dot.innerHTML = `<div>${match ? match.note : rootNote}</div><span class="deg">1</span>`;
+      } else if (match) {
+        dot.className = "note scale";
+        dot.innerHTML = `<div>${match.note}</div><span class="deg">${match.label}</span>`;
+      } else {
+        dot.className = "note dim";
+      }
+      cell.appendChild(dot);
+      row.appendChild(cell);
+    });
+    stringsWrap.appendChild(row);
+  });
+
+  wrap.appendChild(stringsWrap);
+  container.appendChild(wrap);
+}
+
+function formulaFromOffsets(offsets) {
+  // Simple scale-degree count, e.g. a 7-note scale reads "1 2 3 4 5 6 7 8" (8 = octave/root again).
+  const nums = [];
+  for (let i = 1; i <= offsets.length + 1; i++) nums.push(i);
+  return nums.join(" ");
+}
+
+// Fill a <select> with options; items may be plain strings or {value, label}-shaped objects.
+function populateSelect(selectEl, items, valueKey, labelKey) {
+  selectEl.innerHTML = "";
+  items.forEach((item, i) => {
+    const opt = document.createElement("option");
+    opt.value = typeof item === "string" ? item : item[valueKey];
+    opt.textContent = typeof item === "string" ? item : item[labelKey];
+    selectEl.appendChild(opt);
+  });
+}
+
+/* ---------- INTERVALS ---------- */
+// Every interval up to an octave: semitone distance, short abbreviation, and the scale-step
+// numeral used by spellNote() to pick the correct letter name.
+const INTERVALS = [
+  { name: "Unison", abbr: "P1", semitones: 0, numeral: 1 },
+  { name: "Minor 2nd", abbr: "m2", semitones: 1, numeral: 2 },
+  { name: "Major 2nd", abbr: "M2", semitones: 2, numeral: 2 },
+  { name: "Minor 3rd", abbr: "m3", semitones: 3, numeral: 3 },
+  { name: "Major 3rd", abbr: "M3", semitones: 4, numeral: 3 },
+  { name: "Perfect 4th", abbr: "P4", semitones: 5, numeral: 4 },
+  { name: "Tritone", abbr: "TT", semitones: 6, numeral: 4 },
+  { name: "Perfect 5th", abbr: "P5", semitones: 7, numeral: 5 },
+  { name: "Minor 6th", abbr: "m6", semitones: 8, numeral: 6 },
+  { name: "Major 6th", abbr: "M6", semitones: 9, numeral: 6 },
+  { name: "Minor 7th", abbr: "m7", semitones: 10, numeral: 7 },
+  { name: "Major 7th", abbr: "M7", semitones: 11, numeral: 7 },
+  { name: "Octave", abbr: "P8", semitones: 12, numeral: 1 },
+];
+
+const intervalTableBody = document.getElementById("interval-table-body");
+INTERVALS.forEach(iv => {
+  const tr = document.createElement("tr");
+  const exampleNote = spellNote("C", iv.semitones, iv.numeral) + (iv.semitones === 12 ? " (next octave)" : "");
+  tr.innerHTML = `<td>${iv.semitones}</td><td class="left">${iv.name}</td><td>${iv.abbr}</td><td>C → ${exampleNote}</td>`;
+  intervalTableBody.appendChild(tr);
+});
+
+const intervalRootSelect = document.getElementById("interval-root");
+const intervalSelect = document.getElementById("interval-select");
+populateSelect(intervalRootSelect, CHROMATIC);
+populateSelect(intervalSelect, INTERVALS.map(iv => ({ value: `${iv.semitones}`, label: `${iv.name} (${iv.abbr})` })), "value", "label");
+
+// Update the interval-finder result strip and fingerboard for the selected root + interval.
+function renderInterval() {
+  const root = intervalRootSelect.value;
+  const semis = parseInt(intervalSelect.value, 10);
+  const iv = INTERVALS.find(i => i.semitones === semis);
+  const targetNote = spellNote(root, semis, iv.numeral);
+  document.getElementById("interval-result").innerHTML =
+    `<span class="formula-tag">${iv.abbr}</span><span>${semis} semitone${semis === 1 ? "" : "s"}</span><span class="notes-list">${root} → ${targetNote}</span>`;
+  buildScaleBoard(document.getElementById("interval-board"), root, [
+    { offset: 0, numeral: 1, label: "1" },
+    { offset: semis % 12, numeral: iv.numeral, label: iv.abbr },
+  ]);
+}
+intervalRootSelect.addEventListener("change", renderInterval);
+intervalSelect.addEventListener("change", renderInterval);
+
+/* ---------- SCALES ---------- */
+// Scale definitions: semitone offsets from the root, plus their formula-degree labels (b3, #4, etc.).
+const SCALES = [
+  { key: "major", label: "Major (Ionian)", offsets: [0,2,4,5,7,9,11], degrees: ["1","2","3","4","5","6","7"] },
+  { key: "natminor", label: "Natural Minor (Aeolian)", offsets: [0,2,3,5,7,8,10], degrees: ["1","2","b3","4","5","b6","b7"] },
+  { key: "harmminor", label: "Harmonic Minor", offsets: [0,2,3,5,7,8,11], degrees: ["1","2","b3","4","5","b6","7"] },
+  { key: "melminor", label: "Melodic Minor (ascending)", offsets: [0,2,3,5,7,9,11], degrees: ["1","2","b3","4","5","6","7"] },
+  { key: "majpent", label: "Major Pentatonic", offsets: [0,2,4,7,9], degrees: ["1","2","3","5","6"] },
+  { key: "minpent", label: "Minor Pentatonic", offsets: [0,3,5,7,10], degrees: ["1","b3","4","5","b7"] },
+  { key: "blues", label: "Blues Scale", offsets: [0,3,5,6,7,10], degrees: ["1","b3","4","b5","5","b7"] },
+];
+
+const scaleRootSelect = document.getElementById("scale-root");
+const scaleSelect = document.getElementById("scale-select");
+populateSelect(scaleRootSelect, CHROMATIC);
+populateSelect(scaleSelect, SCALES.map(s => ({ value: s.key, label: s.label })), "value", "label");
+
+// Update the scale-explorer result strip and fingerboard for the selected root + scale.
+function renderScale() {
+  const root = scaleRootSelect.value;
+  const scale = SCALES.find(s => s.key === scaleSelect.value);
+  const members = scale.offsets.map((o, i) => ({ offset: o, numeral: numeralFromDegree(scale.degrees[i]), label: scale.degrees[i] }));
+  const noteNames = members.map(m => spellNote(root, m.offset, m.numeral));
+  document.getElementById("scale-result").innerHTML =
+    `<span class="formula-tag">${formulaFromOffsets(scale.offsets)}</span><span class="notes-list">${noteNames.join(" – ")}</span>`;
+  buildScaleBoard(document.getElementById("scale-board"), root, members);
+}
+scaleRootSelect.addEventListener("change", renderScale);
+scaleSelect.addEventListener("change", renderScale);
+
+/* ---------- BLUES CHORD PROGRESSION ---------- */
+// Maps each scale degree used in the blues form (1, 4, 5) to its semitone offset,
+// scale-step numeral, and roman-numeral label.
+const DEGREE_INFO = {
+  1: { offset: 0, numeral: 1, roman: "I" },
+  4: { offset: 5, numeral: 4, roman: "IV" },
+  5: { offset: 7, numeral: 5, roman: "V" },
+};
+
+// Each variation is 12 bars, given as scale-degree numbers (1 = I, 4 = IV, 5 = V).
+const BLUES_VARIATIONS = [
+  { key: "basic", label: "Basic 12-Bar", bars: [1,1,1,1, 4,4,1,1, 5,4,1,1], note: "All dominant 7ths, static for the first four bars — the most common blues form." },
+  { key: "quick", label: "Quick-Change", bars: [1,4,1,1, 4,4,1,1, 5,4,1,1], note: "Moves to the IV in bar 2 before returning to I — adds early harmonic motion." },
+  { key: "turnaround", label: "Turnaround Ending", bars: [1,1,1,1, 4,4,1,1, 5,4,1,5], note: "Ends on the V in bar 12 instead of I, pulling the ear back around to the top of the form." },
+];
+
+const bluesOverviewBody = document.getElementById("blues-overview-body");
+BLUES_VARIATIONS.forEach(v => {
+  const chunk = arr => arr.map(d => DEGREE_INFO[d].roman + "7").join(" &ndash; ");
+  const tr = document.createElement("tr");
+  tr.innerHTML = `<td class="name-cell">${v.label}</td><td>${chunk(v.bars.slice(0, 4))}</td><td>${chunk(v.bars.slice(4, 8))}</td><td>${chunk(v.bars.slice(8, 12))}</td>`;
+  bluesOverviewBody.appendChild(tr);
+});
+
+const bluesRootSelect = document.getElementById("blues-root");
+const bluesVariationSelect = document.getElementById("blues-variation");
+populateSelect(bluesRootSelect, CHROMATIC);
+populateSelect(bluesVariationSelect, BLUES_VARIATIONS.map(v => ({ value: v.key, label: v.label })), "value", "label");
+
+// Update the blues-explorer result strip, bar grid, and fingerboard for the selected root + variation.
+function renderBlues() {
+  const root = bluesRootSelect.value;
+  const variation = BLUES_VARIATIONS.find(v => v.key === bluesVariationSelect.value);
+  const chordNames = variation.bars.map(d => {
+    const info = DEGREE_INFO[d];
+    return spellNote(root, info.offset, info.numeral) + "7";
+  });
+  const uniqueRoman = [...new Set(variation.bars)].map(d => DEGREE_INFO[d].roman).join(" &ndash; ");
+  const uniqueChords = [...new Set(chordNames)].join(" · ");
+  document.getElementById("blues-result").innerHTML =
+    `<span class="formula-tag">${uniqueRoman}</span><span class="notes-list">${uniqueChords}</span>`;
+  document.getElementById("blues-description").textContent = variation.note;
+
+  const barsEl = document.getElementById("blues-bars");
+  barsEl.innerHTML = "";
+  variation.bars.forEach((d, i) => {
+    const info = DEGREE_INFO[d];
+    const div = document.createElement("div");
+    div.className = "blues-bar fn-" + info.roman;
+    div.innerHTML = `<div class="bar-num">Bar ${i + 1}</div><div class="bar-roman">${info.roman}7</div><div class="bar-chord">${chordNames[i]}</div>`;
+    barsEl.appendChild(div);
+  });
+
+  buildScaleBoard(document.getElementById("blues-board"), root, [
+    { offset: 0, numeral: 1, label: "I" },
+    { offset: 5, numeral: 4, label: "IV" },
+    { offset: 7, numeral: 5, label: "V" },
+  ]);
+}
+bluesRootSelect.addEventListener("change", renderBlues);
+bluesVariationSelect.addEventListener("change", renderBlues);
+
+/* ---------- MODES ---------- */
+// The seven modes of the major scale: semitone offsets, formula-degree labels, which major-scale
+// degree each mode starts on (parentDegree), and a one-line character description.
+const MODES = [
+  { key: "ionian", label: "Ionian", offsets: [0,2,4,5,7,9,11], degrees: ["1","2","3","4","5","6","7"], parentDegree: 1, character: "The major scale itself — bright, resolved, the reference point for every other mode." },
+  { key: "dorian", label: "Dorian", offsets: [0,2,3,5,7,9,10], degrees: ["1","2","b3","4","5","6","b7"], parentDegree: 2, character: "Minor but brighter than natural minor — the natural (raised) 6th gives it a lifted, jazzy minor color." },
+  { key: "phrygian", label: "Phrygian", offsets: [0,1,3,5,7,8,10], degrees: ["1","b2","b3","4","5","b6","b7"], parentDegree: 3, character: "Dark and tense — the b2 gives it a Spanish/flamenco flavor." },
+  { key: "lydian", label: "Lydian", offsets: [0,2,4,6,7,9,11], degrees: ["1","2","3","#4","5","6","7"], parentDegree: 4, character: "The brightest major mode — the #4 gives it a dreamy, floating quality." },
+  { key: "mixolydian", label: "Mixolydian", offsets: [0,2,4,5,7,9,10], degrees: ["1","2","3","4","5","6","b7"], parentDegree: 5, character: "Major with a bluesy, dominant edge from the b7 — classic blues, funk, and rock sound." },
+  { key: "aeolian", label: "Aeolian", offsets: [0,2,3,5,7,8,10], degrees: ["1","2","b3","4","5","b6","b7"], parentDegree: 6, character: "The natural minor scale — the standard sad/serious minor color." },
+  { key: "locrian", label: "Locrian", offsets: [0,1,3,5,6,8,10], degrees: ["1","b2","b3","4","b5","b6","b7"], parentDegree: 7, character: "Unstable and dissonant — the diminished 5th keeps it feeling unresolved." },
+];
+
+const modeTableBody = document.getElementById("mode-table-body");
+MODES.forEach(m => {
+  const tr = document.createElement("tr");
+  tr.innerHTML = `<td class="name-cell">${m.label}</td><td>${m.parentDegree}</td><td>${formulaFromOffsets(m.offsets)}</td><td class="left">${m.character}</td>`;
+  modeTableBody.appendChild(tr);
+});
+
+const modeRootSelect = document.getElementById("mode-root");
+const modeSelect = document.getElementById("mode-select");
+populateSelect(modeRootSelect, CHROMATIC);
+populateSelect(modeSelect, MODES.map(m => ({ value: m.key, label: m.label })), "value", "label");
+
+// Update the mode-explorer result strip, character line, and fingerboard for the selected root + mode.
+function renderMode() {
+  const root = modeRootSelect.value;
+  const mode = MODES.find(m => m.key === modeSelect.value);
+  const members = mode.offsets.map((o, i) => ({ offset: o, numeral: numeralFromDegree(mode.degrees[i]), label: mode.degrees[i] }));
+  const noteNames = members.map(m => spellNote(root, m.offset, m.numeral));
+  document.getElementById("mode-result").innerHTML =
+    `<span class="formula-tag">${formulaFromOffsets(mode.offsets)}</span><span class="notes-list">${noteNames.join(" – ")}</span>`;
+  document.getElementById("mode-character").textContent = mode.character;
+  buildScaleBoard(document.getElementById("mode-board"), root, members);
+}
+modeRootSelect.addEventListener("change", renderMode);
+modeSelect.addEventListener("change", renderMode);
+
+/* ---------- Sidenav active-link scrollspy ---------- */
+// Highlights whichever nav link corresponds to the panel currently in view, so the sidenav
+// tracks scroll position without needing a scroll event listener.
+const sidenavLinks = Array.from(document.querySelectorAll(".sidenav a[data-target]"));
+// Mark the link whose data-target matches id as active; clear the "active" class on all others.
+function setActiveSidenavLink(id) {
+  sidenavLinks.forEach(a => a.classList.toggle("active", a.dataset.target === id));
+}
+if ("IntersectionObserver" in window) {
+  // A panel counts as "current" once it enters the top 10%-30% band of the viewport
+  // (the rootMargin shrinks the observed area by 10% from the top and 70% from the bottom),
+  // which keeps the active link stable while scrolling through a tall panel.
+  const spy = new IntersectionObserver(entries => {
+    entries.forEach(entry => { if (entry.isIntersecting) setActiveSidenavLink(entry.target.id); });
+  }, { rootMargin: "-10% 0px -70% 0px", threshold: 0 });
+  sidenavLinks.forEach(a => {
+    const target = document.getElementById(a.dataset.target);
+    if (target) spy.observe(target);
+  });
+}
+
+/* ---------- Init ---------- */
+buildHarmonicsBoard("harmonics-board");
+intervalRootSelect.value = "C";
+intervalSelect.value = "7";
+scaleRootSelect.value = "C";
+scaleSelect.value = "major";
+bluesRootSelect.value = "C";
+bluesVariationSelect.value = "basic";
+modeRootSelect.value = "C";
+modeSelect.value = "ionian";
+renderInterval();
+renderScale();
+renderBlues();
+renderMode();
+setActiveSidenavLink("board-panel");
+</script>
+</body>
+</html>

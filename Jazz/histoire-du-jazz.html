@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A Schematic History of Jazz</title>
+<style>
+  /* ========== COLOR TOKENS (same palette as double_bass_chart.html for
+     visual consistency across this project) ========== */
+  :root {
+    --bg: #14161c;
+    --panel: #1c1f27;
+    --panel-border: #2b2f3a;
+    --text: #e8eaef;
+    --muted: #9aa1b2;
+    --accent: #d9a441;
+    --accent-soft: #3a3120;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f5f4f0;
+      --panel: #ffffff;
+      --panel-border: #e1ded4;
+      --text: #232323;
+      --muted: #6b6b6b;
+      --accent: #b5791a;
+      --accent-soft: #f3e6c9;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    display: flex;
+    align-items: flex-start;
+  }
+  .wrap { flex: 1; min-width: 0; max-width: 980px; margin: 0 auto; padding: 40px 24px 60px; }
+
+  /* ========== LEFT NAV PANEL (sticky, collapses to a horizontal bar on narrow screens) ========== */
+  .sidenav {
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    height: 100vh;
+    overflow-y: auto;
+    flex-shrink: 0;
+    width: 220px;
+    background: var(--panel);
+    border-right: 1px solid var(--panel-border);
+    padding: 24px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .sidenav-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    padding: 0 10px 14px;
+  }
+  .sidenav a {
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 8px 10px;
+    border-radius: 8px;
+    transition: background .12s, color .12s;
+  }
+  .sidenav a:hover { color: var(--text); background: var(--bg); }
+  .sidenav a.active { color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+
+  @media (max-width: 860px) {
+    body { flex-direction: column; }
+    .sidenav {
+      position: static;
+      width: 100%;
+      height: auto;
+      flex-direction: row;
+      overflow-x: auto;
+      overflow-y: visible;
+      border-right: none;
+      border-bottom: 1px solid var(--panel-border);
+      gap: 6px;
+      padding: 14px 16px;
+    }
+    .sidenav-title { display: none; }
+    .sidenav a { flex-shrink: 0; white-space: nowrap; }
+    .wrap { max-width: 100%; }
+  }
+
+  h1 { font-size: 26px; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .subtitle { color: var(--muted); font-size: 14px; margin: 0 0 18px; line-height: 1.5; }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 14px;
+    padding: 28px 24px;
+    margin-bottom: 28px;
+    scroll-margin-top: 20px;
+  }
+  .era-range {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+  }
+  .panel h2 {
+    font-size: 20px;
+    margin: 0 0 12px;
+    font-weight: 600;
+  }
+  .panel p.desc {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin: 0 0 14px;
+  }
+  .figures {
+    font-size: 13px;
+    color: var(--text);
+    margin: 0 0 20px;
+    line-height: 1.6;
+  }
+  .figures .label {
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    margin-right: 8px;
+  }
+
+  /* ========== ALBUM GRID ========== */
+  .albums {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
+  }
+  .album-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .album-cover {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--bg);
+    border: 1px solid var(--panel-border);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+  }
+  .album-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  /* Shown when no cover art could be found for an album — a plain styled
+     tile instead of a broken image icon */
+  .album-cover.placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    padding: 10px;
+    line-height: 1.4;
+  }
+  .album-artist {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.3;
+  }
+  .album-title {
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+    line-height: 1.3;
+  }
+  .album-year {
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .album-note {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  /* ========== STARTER PATH (numbered variant of the album grid) ========== */
+  .starter-albums {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
+  }
+  .starter-albums .album-card { position: relative; }
+  .starter-num {
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #1a1a1a;
+    font-size: 12px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    z-index: 1;
+  }
+
+  footer {
+    color: var(--muted);
+    font-size: 12px;
+    text-align: center;
+    margin-top: 20px;
+    line-height: 1.6;
+    padding: 0 8px;
+  }
+</style>
+</head>
+<body>
+
+<nav class="sidenav" id="sidenav">
+  <div class="sidenav-title">History of Jazz</div>
+  <a href="#roots" data-target="roots">Roots</a>
+  <a href="#neworleans" data-target="neworleans">New Orleans &amp; Dixieland</a>
+  <a href="#swing" data-target="swing">Swing / Big Band</a>
+  <a href="#bebop" data-target="bebop">Bebop</a>
+  <a href="#cool" data-target="cool">Cool &amp; West Coast</a>
+  <a href="#hardbop" data-target="hardbop">Hard Bop</a>
+  <a href="#modal" data-target="modal">Modal Jazz</a>
+  <a href="#free" data-target="free">Free Jazz</a>
+  <a href="#postbop" data-target="postbop">Post-Bop</a>
+  <a href="#fusion" data-target="fusion">Jazz Fusion</a>
+  <a href="#smooth" data-target="smooth">Smooth Jazz</a>
+  <a href="#neotrad" data-target="neotrad">Neo-Traditionalism</a>
+  <a href="#contemporary" data-target="contemporary">Contemporary</a>
+  <a href="#starter" data-target="starter">15-Album Starter Path</a>
+</nav>
+
+<div class="wrap">
+  <h1>A Schematic History of Jazz</h1>
+  <p class="subtitle">An era-by-era map of how jazz evolved, who drove each shift, and the albums worth hearing to understand it. Jazz didn't move in a straight line — styles overlapped, coexisted, and looped back on each other — but this rough chronology is the standard way historians and musicians frame it.</p>
+
+  <!-- Panels and album data are rendered by the script at the bottom from the ERAS array,
+       so the markup/content only needs to be edited in one place (the JS data). -->
+  <div id="eras"></div>
+
+  <!-- STARTER PATH -->
+  <div class="panel" id="starter">
+    <h2>A 15-Album Starter Path</h2>
+    <p class="desc">If you're building a jazz collection from scratch, listened to roughly in this order this gives a working sense of the whole arc.</p>
+    <div class="starter-albums" id="starter-albums"></div>
+  </div>
+
+  <footer>
+    A note on sourcing: this overview reflects widely agreed-upon jazz-historical consensus (the kind found in standard references like Ted Gioia's <em>The History of Jazz</em> or the Ken Burns <em>Jazz</em> documentary), not a single disputed reading — but as with any genre history, specialists will quibble over emphasis and boundaries between eras.<br>
+    Album artwork via the iTunes Search API; two albums (the original 1989 <em>Naked City</em> and 2012 <em>Black Radio</em>) aren't in that catalog, so they show as plain tiles instead of a substituted cover.
+  </footer>
+</div>
+
+<script>
+/* ---------- DATA ----------
+   One entry per era. Each album has:
+     artist, title, year  - display fields
+     note   - optional one-line reason it's essential (shown under the year)
+     img    - iTunes artwork URL (400x400), or "" to render a text placeholder tile
+   `starter` (bottom of file) reuses the exact same album objects by reference
+   where the album also appears in an era, so there's one source of truth per cover. */
+
+const A = (artist, title, year, img, note) => ({ artist, title, year, img, note });
+
+const hotfives = A("Louis Armstrong", "The Hot Fives and Hot Sevens", "1925–1928",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/fc/7c/6e/fc7c6e68-985c-1b1f-900d-ed210bedf1d0/197188345983.jpg/400x400bb.jpg",
+  "The moment jazz becomes about the individual improviser");
+const mortonlibrary = A("Jelly Roll Morton", "Red Hot Peppers sides", "1926–1927",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/7e/16/68/7e1668ad-5cae-117a-1836-f1507f62b896/mzi.gvpeiido.jpg/400x400bb.jpg",
+  "New Orleans ensemble jazz at its most sophisticated");
+const kingoliver = A("King Oliver's Creole Jazz Band", "Off the Record: The Complete 1923 Recordings", "1923",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/0c/14/a5/0c14a5b3-94ee-c0d5-2415-b74a40e8eaef/cover.jpg/400x400bb.jpg", "");
+
+const ellingtonblanton = A("Duke Ellington", "The Blanton-Webster Band", "1940–1942",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/db/4a/a1/db4aa1f4-264e-fdae-d7a4-40e72e26c991/828765085724.jpg/400x400bb.jpg",
+  "Widely considered his greatest working band");
+const basiedecca = A("Count Basie", "The Complete Decca Recordings", "1937–1939",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/63/b9/76/63b97602-12cd-d565-ac06-6a8101d90733/00602567850182.rgb.jpg/400x400bb.jpg",
+  "The definitive swing rhythm section");
+const ladyday = A("Billie Holiday", "Lady Day: The Complete Billie Holiday on Columbia", "1933–1944",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music1/v4/9d/57/61/9d576142-48d0-537d-ea39-1826590e9b91/886445100013.jpg/400x400bb.jpg", "");
+const goodmancarnegie = A("Benny Goodman", "Live at Carnegie Hall", "1938",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music/51/2c/09/mzi.ghpdiyij.jpg/400x400bb.jpg",
+  "The concert that legitimized jazz as concert music");
+
+const parkersavoy = A("Charlie Parker", "The Complete Savoy and Dial Studio Recordings", "1945–1948",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/d2/da/e9/d2dae9ba-93e2-390f-7c76-08891d35386b/20CRGIM23230.rgb.jpg/400x400bb.jpg",
+  "The bebop cornerstone");
+const gillespiegroovin = A("Dizzy Gillespie", "Groovin' High", "1945",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/52/7f/c2/527fc215-5215-3d5d-4925-1794a1146de8/00888072059504.rgb.jpg/400x400bb.jpg", "");
+const monkgenius = A("Thelonious Monk", "Genius of Modern Music, Vol. 1", "1947–1948",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/97/e1/c1/97e1c140-2264-41d8-ec84-281a0152c5a2/00602577697326.rgb.jpg/400x400bb.jpg", "");
+
+const birthofcool = A("Miles Davis", "Birth of the Cool", "rec. 1949–50, rel. 1957",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/c2/0b/d4/c20bd438-fc2b-f911-bcd7-793c50c2961f/05099963651850.rgb.jpg/400x400bb.jpg",
+  "The record that named the movement");
+const timeout = A("Dave Brubeck Quartet", "Time Out", "1959",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/7a/e3/06/7ae30672-0c73-a4d4-0a74-624eefc2843b/dj.ytdbjvto.jpg/400x400bb.jpg",
+  "Unusual time signatures; first jazz album to sell a million copies");
+const chetsings = A("Chet Baker", "Chet Baker Sings", "1954",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/2f/99/e5/2f99e569-3920-07ab-b29e-c2da9b50468d/16UMGIM49055.rgb.jpg/400x400bb.jpg", "");
+
+const moanin = A("Art Blakey and the Jazz Messengers", "Moanin'", "1958",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/83/91/66/839166b8-0b77-a5fa-c5ff-16907ffe54d4/19UMGIM32054.rgb.jpg/400x400bb.jpg", "");
+const saxcolossus = A("Sonny Rollins", "Saxophone Colossus", "1956",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/31/39/11/31391100-1c51-40d4-de7e-6c20337892b2/00025218810524.rgb.jpg/400x400bb.jpg", "");
+const brownroach = A("Clifford Brown and Max Roach", "Clifford Brown and Max Roach", "1954",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/cd/2a/64/cd2a64bd-ddec-bf69-76cc-99852bdc1b56/00602567828495.rgb.jpg/400x400bb.jpg", "");
+const songformyfather = A("Horace Silver", "Song for My Father", "1964",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/ba/d6/43/bad64364-1125-40b8-daa6-d49789f8b1a0/19UMGIM60341.rgb.jpg/400x400bb.jpg",
+  "Rooted in the hard bop language of the prior decade");
+
+const kindofblue = A("Miles Davis", "Kind of Blue", "1959",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music/7f/9f/d6/mzi.vtnaewef.jpg/400x400bb.jpg",
+  "If you listen to only one jazz album ever, it's this one");
+const lovesupreme = A("John Coltrane", "A Love Supreme", "1965",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/e5/24/aa/e524aacd-467b-66f3-8931-0fcd6750a4b9/08UMGIM07914.rgb.jpg/400x400bb.jpg",
+  "A four-part spiritual suite, arguably the second-most-essential jazz album");
+const sundayvillage = A("Bill Evans Trio", "Sunday at the Village Vanguard", "1961",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/3d/f2/ab/3df2ab45-5e51-b4b6-07dd-daefe8c0ecbc/00888072305090.rgb.jpg/400x400bb.jpg", "");
+
+const shapeofjazz = A("Ornette Coleman", "The Shape of Jazz to Come", "1959",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ec/fe/82/ecfe82b7-b821-b318-17ad-512b9cd1717b/s06.afpdcbhn.jpg/400x400bb.jpg", "");
+const freejazz = A("Ornette Coleman", "Free Jazz", "1961",
+  "https://is1-ssl.mzstatic.com/image/thumb/Features/v4/6f/09/84/6f098449-23bc-4c33-a9fd-6da9887aba45/dj.yrbzojng.jpg/400x400bb.jpg",
+  "Gave the movement its name");
+const ascension = A("John Coltrane", "Ascension", "1965",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/49/39/f6/4939f68e-00a5-49f4-9642-57020b789e19/00602547491763.rgb.jpg/400x400bb.jpg", "");
+const unitstructures = A("Cecil Taylor", "Unit Structures", "1966",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music6/v4/47/87/a9/4787a99e-a867-adbd-0b38-48edfcde606c/00077778423751.jpg/400x400bb.jpg", "");
+
+const maidenvoyage = A("Herbie Hancock", "Maiden Voyage", "1965",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/64/b6/04/64b6040c-a931-0a5c-6b7c-82e0dd5c3d4c/19UMGIM73745.rgb.jpg/400x400bb.jpg", "");
+const speaknoevil = A("Wayne Shorter", "Speak No Evil", "1966",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/a8/ee/3c/a8ee3cc7-e694-f7e1-5208-2c67f9ae5ed5/13ULAIM49176.rgb.jpg/400x400bb.jpg", "");
+const nefertiti = A("Miles Davis Quintet", "Nefertiti", "1968",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/d0/21/fe/d021fe7c-1d72-0205-5f8d-18d9a7e062cd/074646568125.jpg/400x400bb.jpg", "");
+
+const bitchesbrew = A("Miles Davis", "Bitches Brew", "1970",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/9b/e1/63/9be1630c-486d-760c-76cf-04282174700a/074646577424.jpg/400x400bb.jpg",
+  "The record that detonated the genre");
+const heavyweather = A("Weather Report", "Heavy Weather", "1977",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/93/6e/c2/936ec2d4-1cc1-f60a-ff6c-4ba6f9ffcdb5/074646510827.jpg/400x400bb.jpg",
+  "Featuring “Birdland”");
+const headhunters = A("Herbie Hancock", "Head Hunters", "1973",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/4f/e5/f5/4fe5f511-462e-e87b-0711-d4e42809fb17/dj.goshfswo.jpg/400x400bb.jpg",
+  "Jazz-funk, hugely commercially successful");
+const innermounting = A("Mahavishnu Orchestra", "The Inner Mounting Flame", "1971",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music7/v4/d9/32/c1/d932c164-9f19-b3e9-c1cb-b017783b74a4/dj.blxgjyql.jpg/400x400bb.jpg", "");
+
+const breezin = A("George Benson", "Breezin'", "1976",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music/y2005/m08/d17/h19/mzi.ilzyvqno.jpg/400x400bb.jpg", "");
+const winelight = A("Grover Washington Jr.", "Winelight", "1980",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/81/2b/74/812b74f7-060b-7386-bb02-967cd2cdd78c/mzi.yfyaqhnz.jpg/400x400bb.jpg", "");
+
+const blackcodes = A("Wynton Marsalis", "Black Codes (From the Underground)", "1985",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/ff/41/8c/ff418c45-78eb-3225-dfc3-a7bc9c1974d2/074644000924.jpg/400x400bb.jpg", "");
+const nakedcity = A("John Zorn", "Naked City", "1989", "", "");
+
+const theepic = A("Kamasi Washington", "The Epic", "2015",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music3/v4/ee/f3/42/eef342b0-6024-1bb3-15db-426aa5ee1eb8/kw_1400.jpg/400x400bb.jpg", "");
+const blackradio = A("Robert Glasper Experiment", "Black Radio", "2012", "", "");
+const emilysdevolution = A("Esperanza Spalding", "Emily's D+Evolution", "2016",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/be/ce/10/bece103a-6e8d-4844-4436-de168eb022c9/00888072391482.rgb.jpg/400x400bb.jpg", "");
+const mehldauvanguard = A("Brad Mehldau", "Art of the Trio, Vol. 2: Live at the Village Vanguard", "1998",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music/6a/dd/02/mzi.cilrlhsv.jpg/400x400bb.jpg", "");
+
+/* Each era: id (matches the sidenav anchors + panel ids), range, title, desc, figures, albums[] */
+const ERAS = [
+  { id: "roots", range: "1890s–1900s", title: "Roots: Blues, Ragtime, and New Orleans",
+    desc: "Jazz emerged in New Orleans around the turn of the 20th century, at the meeting point of African rhythmic traditions, blues, ragtime piano, brass-band marches, and Creole and Caribbean influences. Congo Square, where enslaved and free Black New Orleanians gathered to play music on Sundays, is often cited as a symbolic origin point. No jazz recordings exist from this period — the music was still oral and local — but ragtime (Scott Joplin) and the blues (W.C. Handy) are its direct ancestors and worth hearing to understand what jazz grew out of.",
+    figures: "Scott Joplin, W.C. Handy",
+    albums: [ A("Scott Joplin", "Piano rolls and rags (recorded posthumously by others)", "d. 1917", "", "Joplin died before jazz was captured on record") ] },
+
+  { id: "neworleans", range: "1900s–1920s", title: "New Orleans and Dixieland Jazz",
+    desc: "The first jazz recordings appeared in 1917 (the Original Dixieland Jass Band), but the more historically important figures are Buddy Bolden (unrecorded, but considered the first jazz musician by reputation), Jelly Roll Morton, King Oliver, and above all Louis Armstrong, whose Hot Five and Hot Seven sessions redefined jazz around the soloist rather than collective ensemble playing.",
+    figures: "Buddy Bolden, Jelly Roll Morton, King Oliver, Louis Armstrong",
+    albums: [ hotfives, mortonlibrary, kingoliver ] },
+
+  { id: "swing", range: "1930s–1940s", title: "Swing and the Big Band Era",
+    desc: "Jazz became America's popular dance music. Big bands, tight arrangements, and star soloists defined the sound, and it's the era when jazz was mainstream entertainment rather than a subculture.",
+    figures: "Duke Ellington, Count Basie, Benny Goodman, Fletcher Henderson, Chick Webb, Billie Holiday, Ella Fitzgerald",
+    albums: [ ellingtonblanton, basiedecca, ladyday, goodmancarnegie ] },
+
+  { id: "bebop", range: "mid-1940s", title: "Bebop",
+    desc: "A deliberate break from swing: fast tempos, complex harmony, small combos instead of big bands, and improvisation as the whole point rather than a garnish. Born in after-hours jam sessions in Harlem (notably at Minton's Playhouse).",
+    figures: "Charlie Parker, Dizzy Gillespie, Thelonious Monk, Bud Powell, Max Roach",
+    albums: [ parkersavoy, gillespiegroovin, monkgenius ] },
+
+  { id: "cool", range: "late 1940s–1950s", title: "Cool Jazz and West Coast Jazz",
+    desc: "A reaction to bebop's intensity: lighter tone, more arrangement, slower tempos, influences from classical music. Centered partly on the West Coast but starting with Miles Davis in New York.",
+    figures: "Miles Davis, Gerry Mulligan, Chet Baker, Dave Brubeck, Lee Konitz",
+    albums: [ birthofcool, timeout, chetsings ] },
+
+  { id: "hardbop", range: "1950s", title: "Hard Bop",
+    desc: "Bebop's harder-edged, more blues- and gospel-inflected successor, developed largely on the East Coast as a response to cool jazz's restraint.",
+    figures: "Art Blakey, Horace Silver, Sonny Rollins, Clifford Brown, Max Roach",
+    albums: [ moanin, saxcolossus, brownroach, songformyfather ] },
+
+  { id: "modal", range: "late 1950s–1960s", title: "Modal Jazz",
+    desc: "Instead of improvising over dense chord changes, musicians improvised over static scales/modes, opening up more melodic freedom. This era produced the best-selling and most widely recommended jazz album ever made.",
+    figures: "Miles Davis, John Coltrane, Bill Evans",
+    albums: [ kindofblue, lovesupreme, sundayvillage ] },
+
+  { id: "free", range: "1960s", title: "Free Jazz and the Avant-Garde",
+    desc: "A rejection of fixed chords, tempo, and even conventional tonality, running parallel to the era's social upheaval. Divisive at the time, hugely influential since.",
+    figures: "Ornette Coleman, Cecil Taylor, Albert Ayler, Sun Ra, late-period Coltrane",
+    albums: [ shapeofjazz, freejazz, ascension, unitstructures ] },
+
+  { id: "postbop", range: "1960s", title: "Post-Bop",
+    desc: "Musicians who kept swing and harmonic sophistication but absorbed modal and free innovations without going fully outside — often described as the most harmonically advanced era of “straight-ahead” jazz.",
+    figures: "Wayne Shorter, Herbie Hancock, the Miles Davis Second Great Quintet (with Shorter, Hancock, Ron Carter, Tony Williams)",
+    albums: [ maidenvoyage, speaknoevil, nefertiti ] },
+
+  { id: "fusion", range: "late 1960s–1970s", title: "Jazz Fusion",
+    desc: "Jazz merges with rock, funk, and electric instrumentation. Divisive among purists, foundational for everything that follows in jazz-adjacent popular music.",
+    figures: "Miles Davis, Weather Report, Herbie Hancock, Chick Corea and Return to Forever, Mahavishnu Orchestra",
+    albums: [ bitchesbrew, heavyweather, headhunters, innermounting ] },
+
+  { id: "smooth", range: "1970s–1980s", title: "Smooth Jazz and Jazz-Funk",
+    desc: "A more commercial, radio-friendly branch of fusion, often criticized by jazz purists as watered down but genuinely popular and technically accomplished.",
+    figures: "Grover Washington Jr., George Benson, Bob James",
+    albums: [ breezin, winelight ] },
+
+  { id: "neotrad", range: "1980s–1990s", title: "Neo-Traditionalism / The Young Lions",
+    desc: "A conscious return to acoustic, pre-fusion jazz values, spearheaded by Wynton Marsalis and institutionalized through Jazz at Lincoln Center. Simultaneously, downtown NYC musicians (John Zorn, the “Knitting Factory” scene) kept the avant-garde alive.",
+    figures: "Wynton Marsalis, Branford Marsalis, John Zorn",
+    albums: [ blackcodes, nakedcity ] },
+
+  { id: "contemporary", range: "2000s–present", title: "Contemporary Jazz",
+    desc: "No single dominant style — jazz today draws on hip-hop, neo-soul, electronic music, odd-meter grooves, and the entire preceding canon at once, often by musicians who move fluidly between jazz and other genres.",
+    figures: "Kamasi Washington, Robert Glasper, Esperanza Spalding, Brad Mehldau, Christian Scott aTunde Adjuah, Vijay Iyer",
+    albums: [ theepic, blackradio, emilysdevolution, mehldauvanguard ] },
+];
+
+const STARTER = [
+  hotfives, ellingtonblanton, ladyday, parkersavoy, monkgenius, birthofcool, timeout,
+  saxcolossus, moanin, kindofblue, lovesupreme, shapeofjazz, maidenvoyage, bitchesbrew, theepic,
+];
+
+/* ---------- RENDER ---------- */
+
+// Builds one album-card's inner HTML: cover art (or a placeholder tile if no
+// image was found), artist, title, year, and an optional one-line note.
+function albumCardHtml(al) {
+  const cover = al.img
+    ? `<div class="album-cover"><img src="${al.img}" alt="${al.artist} — ${al.title}" loading="lazy"></div>`
+    : `<div class="album-cover placeholder">${al.artist}<br>${al.title}</div>`;
+  return `
+    ${cover}
+    <div class="album-artist">${al.artist}</div>
+    <div class="album-title">${al.title}</div>
+    <div class="album-year">${al.year}</div>
+    ${al.note ? `<div class="album-note">${al.note}</div>` : ""}
+  `;
+}
+
+const erasEl = document.getElementById("eras");
+ERAS.forEach(era => {
+  const panel = document.createElement("div");
+  panel.className = "panel";
+  panel.id = era.id;
+  panel.innerHTML = `
+    <span class="era-range">${era.range}</span>
+    <h2>${era.title}</h2>
+    <p class="desc">${era.desc}</p>
+    <p class="figures"><span class="label">Key figures</span>${era.figures}</p>
+    <div class="albums">${era.albums.map(al => `<div class="album-card">${albumCardHtml(al)}</div>`).join("")}</div>
+  `;
+  erasEl.appendChild(panel);
+});
+
+const starterEl = document.getElementById("starter-albums");
+STARTER.forEach((al, i) => {
+  const card = document.createElement("div");
+  card.className = "album-card";
+  card.innerHTML = `<div class="starter-num">${i + 1}</div>${albumCardHtml(al)}`;
+  starterEl.appendChild(card);
+});
+
+/* ---------- Sidenav active-link scrollspy (same pattern as double_bass_chart.html) ---------- */
+const sidenavLinks = Array.from(document.querySelectorAll(".sidenav a[data-target]"));
+function setActiveSidenavLink(id) {
+  sidenavLinks.forEach(a => a.classList.toggle("active", a.dataset.target === id));
+}
+if ("IntersectionObserver" in window) {
+  const spy = new IntersectionObserver(entries => {
+    entries.forEach(entry => { if (entry.isIntersecting) setActiveSidenavLink(entry.target.id); });
+  }, { rootMargin: "-10% 0px -70% 0px", threshold: 0 });
+  sidenavLinks.forEach(a => {
+    const target = document.getElementById(a.dataset.target);
+    if (target) spy.observe(target);
+  });
+}
+setActiveSidenavLink("roots");
+</script>
+</body>
+</html>

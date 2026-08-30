@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>12-Bar Jazz Blues — Roman Numerals</title>
+<style>
+  /* ========== PAGE SETUP ========== */
+  @page { size: A4 portrait; margin: 8mm; }
+  /* Fix the page to A4 dimensions so the layout looks the same on screen and when printed */
+  html, body { width: 210mm; min-height: 160mm; margin: 0; padding: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ========== COLOR TOKENS (referenced throughout via var()) ========== */
+  :root {
+    --color-text-primary: #1a1612;
+    --color-text-secondary: #6b7280;
+    --color-text-tertiary: #9ca3af;
+    --color-border-secondary: #d1d5db;
+    --color-border-tertiary: #e5e7eb;
+    --color-background-secondary: #f9f8f4;
+    --color-background-primary: #ffffff;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-text-primary: #f3f4f6;
+      --color-text-secondary: #9ca3af;
+      --color-text-tertiary: #6b7280;
+      --color-border-secondary: #4b5563;
+      --color-border-tertiary: #374151;
+      --color-background-secondary: #1f2937;
+      --color-background-primary: #111827;
+    }
+  }
+
+  body { background: #f6f5f1; }
+
+  /* ========== POSTER CONTAINER ========== */
+  /* Main content wrapper, sized to the printable area and centered on the page */
+  .poster {
+    font-family: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    padding: 16px 14px;
+    width: calc(100% - 16mm);
+    max-width: 186mm;
+    min-height: calc(160mm - 16mm);
+    margin: 0 auto;
+    background: #f6f5f1;
+    overflow: hidden;
+  }
+
+  .poster-title {
+    text-align: center;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin-bottom: 4px;
+  }
+
+  .poster-subtitle {
+    text-align: center;
+    font-size: 10px;
+    color: var(--color-text-secondary);
+    margin-bottom: 14px;
+    letter-spacing: 0.06em;
+  }
+
+  /* ========== TAB BUTTONS ========== */
+  /* Each element below has two class names (e.g. .era-tabs/.tab-bar) so either
+     the "era-" naming or the generic "tab" naming can be used in the markup */
+  .era-tabs,
+  .tab-bar {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin: 12px 0 16px;
+    flex-wrap: wrap;
+  }
+
+  /* Extra top spacing when the tabs sit right after the visually-hidden heading */
+  h2.sr-only + .era-tabs { margin-top: 16px; }
+
+  .era-btn,
+  .tab {
+    padding: 5px 14px;
+    border-radius: 18px;
+    font-size: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--color-border-secondary);
+    color: var(--color-text-secondary);
+    background: transparent;
+    transition: all .15s;
+  }
+
+  /* Active tab: red color (light & dark mode) */
+  .era-btn.active,
+  .tab.active {
+    background: #ef4444;
+    border-color: #b91c1c;
+    color: #ffffff;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .era-btn.active,
+    .tab.active {
+      background: #b91c1c;
+      border-color: #ef4444;
+      color: #ffffff;
+    }
+  }
+
+  /* ========== HEADER SECTION ========== */
+  .era-header {
+    margin-bottom: 12px;
+    padding: 10px 13px;
+    border-radius: 10px;
+    border: 1px solid var(--color-border-tertiary);
+    background: var(--color-background-secondary);
+  }
+
+  .era-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+
+  .era-note {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+    margin-top: 3px;
+    font-style: italic;
+  }
+
+  /* ========== LEGEND ========== */
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  /* Same dual-naming pattern as the tab buttons above (.leg/.legend-item) */
+  .leg,
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    color: var(--color-text-secondary);
+  }
+
+  /* Small colored circle shown next to each legend label */
+  .leg-dot,
+  .legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 7px;
+    font-weight: 500;
+  }
+
+  .divider-line {
+    border: none;
+    border-top: 1px solid var(--color-border-tertiary);
+    margin-bottom: 16px;
+  }
+
+  /* ========== BAR GRID ========== */
+  .row-label {
+    font-size: 10px;
+    color: var(--color-text-tertiary);
+    margin: 10px 0 5px;
+    letter-spacing: .04em;
+    text-align: center;
+  }
+
+  .bar-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 5px;
+  }
+
+  /* Individual bar card */
+  .bar {
+    border-radius: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    padding: 12px 10px 10px;
+    min-height: 72px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 4px;
+    background: #ffffff;
+    box-shadow: 0 6px 12px rgba(15, 23, 42, 0.08);
+  }
+
+  /* Small "Bar N" number shown at the top of each bar card */
+  .b-num {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    margin-bottom: 2px;
+  }
+
+  /* Primary (larger) Roman numeral for the bar's main chord */
+  .b-roman {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+    color: var(--color-text-primary);
+  }
+
+  /* Secondary (smaller) Roman numeral, used when a bar has more than one
+     chord (e.g. a ii–V within the bar) — rendered below/after the primary one */
+  .b-roman2 {
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+    color: var(--color-text-primary);
+  }
+
+  /* Optional short annotation label (e.g. "turnaround", "tritone sub") shown under the roman numerals */
+  .b-tag {
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-align: center;
+    opacity: .9;
+    margin-top: 2px;
+    color: var(--color-text-secondary);
+  }
+
+  /* ========== FUNCTIONAL HARMONY COLORS ========== */
+  /* I (Tonic) - Blue */
+  .fn-I { background: #EFF6FF; border-color: #93C5FD; }
+  .fn-I .b-roman,
+  .fn-I .b-roman2 { color: #1E40AF; }
+
+  /* IV (Subdominant) - Green */
+  .fn-IV { background: #F0FDF4; border-color: #86EFAC; }
+  .fn-IV .b-roman,
+  .fn-IV .b-roman2 { color: #166534; }
+
+  /* V (Dominant) - Orange */
+  .fn-V { background: #FFF7ED; border-color: #FDB37F; }
+  .fn-V .b-roman,
+  .fn-V .b-roman2 { color: #9A3412; }
+
+  /* II (Supertonic) - Purple */
+  .fn-II { background: #FAF5FF; border-color: #C4B5FD; }
+  .fn-II .b-roman,
+  .fn-II .b-roman2 { color: #5B21B6; }
+
+  /* VI (Submediant) - Red */
+  .fn-VI { background: #FFF1F2; border-color: #FCA5A5; }
+  .fn-VI .b-roman,
+  .fn-VI .b-roman2 { color: #991B1B; }
+
+  /* III (Mediant) - Teal */
+  .fn-III { background: #ECFDF5; border-color: #6EE7B7; }
+  .fn-III .b-roman,
+  .fn-III .b-roman2 { color: #065F46; }
+
+  /* Diminished / Half-diminished - Indigo */
+  .fn-dim { background: #F5F3FF; border-color: #A78BFA; }
+  .fn-dim .b-roman,
+  .fn-dim .b-roman2 { color: #4C1D95; }
+
+  /* Repetition (same chord) - Secondary background */
+  .fn-rep { background: var(--color-background-secondary); border-color: var(--color-border-tertiary); }
+  .fn-rep .b-roman,
+  .fn-rep .b-roman2 { color: var(--color-text-tertiary); }
+
+  /* ========== DARK MODE OVERRIDES ========== */
+  @media (prefers-color-scheme: dark) {
+    .fn-I { background: #1E3A8A; border-color: #3B82F6; }
+    .fn-I .b-roman,
+    .fn-I .b-roman2 { color: #BFDBFE; }
+
+    .fn-IV { background: #14532D; border-color: #4ADE80; }
+    .fn-IV .b-roman,
+    .fn-IV .b-roman2 { color: #BBF7D0; }
+
+    .fn-V { background: #431407; border-color: #FB923C; }
+    .fn-V .b-roman,
+    .fn-V .b-roman2 { color: #FED7AA; }
+
+    .fn-II { background: #2E1065; border-color: #A78BFA; }
+    .fn-II .b-roman,
+    .fn-II .b-roman2 { color: #DDD6FE; }
+
+    .fn-VI { background: #450A0A; border-color: #F87171; }
+    .fn-VI .b-roman,
+    .fn-VI .b-roman2 { color: #FECACA; }
+
+    .fn-III { background: #022C22; border-color: #34D399; }
+    .fn-III .b-roman,
+    .fn-III .b-roman2 { color: #A7F3D0; }
+
+    .fn-dim { background: #2E1065; border-color: #7C3AED; }
+    .fn-dim .b-roman,
+    .fn-dim .b-roman2 { color: #DDD6FE; }
+  }
+</style>
+</head>
+<body>
+<div class="poster">
+  <!-- Page title (hidden from view, used for accessibility & semantics) -->
+  <h2 class="sr-only">12-bar jazz blues progressions in Roman numerals</h2>
+
+  <!-- Tab buttons to select different progressions -->
+  <div class="era-tabs" id="tabs"></div>
+
+  <!-- Header showing current progression title and description -->
+  <div class="era-header">
+    <div class="era-name" id="hd-name"></div>
+    <div class="era-note" id="hd-note"></div>
+  </div>
+
+  <!-- Legend explaining chord functions by color -->
+  <div class="legend">
+    <div class="leg"><div class="leg-dot" style="background:#3B82F6"></div>I tonic</div>
+    <div class="leg"><div class="leg-dot" style="background:#4ADE80"></div>IV subdominant</div>
+    <div class="leg"><div class="leg-dot" style="background:#FB923C"></div>V dominant</div>
+    <div class="leg"><div class="leg-dot" style="background:#A78BFA"></div>II supertonic</div>
+    <div class="leg"><div class="leg-dot" style="background:#F87171"></div>VI submediant</div>
+    <div class="leg"><div class="leg-dot" style="background:#34D399"></div>III mediant</div>
+    <div class="leg"><div class="leg-dot" style="background:#7C3AED"></div>dim / ø</div>
+  </div>
+
+  <!-- Grid container for the 12-bar progressions (populated by JavaScript) -->
+  <div id="grid"></div>
+</div>
+
+<script>
+  /**
+   * 12-BAR BLUES PROGRESSIONS DATA
+   * Array of 6 different historical and stylistic variations of 12-bar blues in Roman numerals
+   * Each progression contains 3 rows of 4 bars (12 bars total)
+   * Colors correspond to harmonic function: I(blue), IV(green), V(orange), II(purple), VI(red), III(teal), dim(indigo)
+   *
+   * Shape of each progression object:
+   *   id    - unique key used to mark/find the matching tab button
+   *   label - short name shown on the tab and in the header
+   *   note  - one-line description shown under the header label
+   *   rows  - 3 arrays of 4 bar objects; each bar object has:
+   *     n   - bar number (1-12), shown in the "Bar N" label
+   *     r   - array of Roman numeral chord symbols for the bar; a second
+   *           entry means the chord changes partway through the bar
+   *           (e.g. a ii-V within one bar), rendered smaller below the first
+   *     fn  - harmonic-function key, maps to the .fn-* CSS classes for coloring
+   *     tag - optional short annotation printed under the roman numerals
+   */
+  const PROGS = [
+    {
+      id: "basic",
+      label: "Basic blues",
+      note: "All dominant 7ths — no turnaround",
+      rows: [
+        [
+          { n: 1, r: ["I7"], fn: "I" },
+          { n: 2, r: ["I7"], fn: "I" },
+          { n: 3, r: ["I7"], fn: "I" },
+          { n: 4, r: ["I7"], fn: "I" },
+        ],
+        [
+          { n: 5, r: ["IV7"], fn: "IV" },
+          { n: 6, r: ["IV7"], fn: "IV" },
+          { n: 7, r: ["I7"], fn: "I" },
+          { n: 8, r: ["I7"], fn: "I" },
+        ],
+        [
+          { n: 9, r: ["V7"], fn: "V" },
+          { n: 10, r: ["IV7"], fn: "IV" },
+          { n: 11, r: ["I7"], fn: "I" },
+          { n: 12, r: ["I7"], fn: "I" },
+        ],
+      ],
+    },
+    {
+      id: "s1930",
+      label: "1930s evolution",
+      note: "Quick IV in bar 2 · V7 turnaround in bar 12",
+      rows: [
+        [
+          { n: 1, r: ["I7"], fn: "I" },
+          { n: 2, r: ["IV7"], fn: "IV", tag: "quick IV" },
+          { n: 3, r: ["I7"], fn: "I" },
+          { n: 4, r: ["I7"], fn: "I" },
+        ],
+        [
+          { n: 5, r: ["IV7"], fn: "IV" },
+          { n: 6, r: ["IV7"], fn: "IV" },
+          { n: 7, r: ["I7"], fn: "I" },
+          { n: 8, r: ["I7"], fn: "I" },
+        ],
+        [
+          { n: 9, r: ["V7"], fn: "V" },
+          { n: 10, r: ["IV7"], fn: "IV" },
+          { n: 11, r: ["I7"], fn: "I" },
+          { n: 12, r: ["V7"], fn: "V", tag: "turnaround" },
+        ],
+      ],
+    },
+    {
+      id: "basie",
+      label: "Count Basie changes",
+      note: "Diminished passing chords · secondary dominant D7 in bar 8",
+      rows: [
+        [
+          { n: 1, r: ["I7"], fn: "I" },
+          { n: 2, r: ["IV7", "iv°"], fn: "IV", tag: "passing dim" },
+          { n: 3, r: ["I7", "IIm7"], fn: "I", tag: "chromatic" },
+          { n: 4, r: ["I7"], fn: "I" },
+        ],
+        [
+          { n: 5, r: ["IV7"], fn: "IV" },
+          { n: 6, r: ["iv°"], fn: "dim", tag: "passing dim" },
+          { n: 7, r: ["I7"], fn: "I" },
+          { n: 8, r: ["VI7"], fn: "VI", tag: "V of ii" },
+        ],
+        [
+          { n: 9, r: ["V7"], fn: "V" },
+          { n: 10, r: ["IV7"], fn: "IV" },
+          { n: 11, r: ["I7"], fn: "I" },
+          { n: 12, r: ["V7"], fn: "V", tag: "turnaround" },
+        ],
+      ],
+    },
+    {
+      id: "bebop",
+      label: "Bebop changes",
+      note: "ii–V motion throughout · #iv° passing · iii–VI–ii–V turnaround",
+      rows: [
+        [
+          { n: 1, r: ["I7"], fn: "I" },
+          { n: 2, r: ["IV7"], fn: "IV" },
+          { n: 3, r: ["I7"], fn: "I" },
+          { n: 4, r: ["IIIm7", "I7"], fn: "III", tag: "ii–V to IV" },
+        ],
+        [
+          { n: 5, r: ["IV7"], fn: "IV" },
+          { n: 6, r: ["#iv°"], fn: "dim", tag: "passing dim" },
+          { n: 7, r: ["I7"], fn: "I" },
+          { n: 8, r: ["IIIm7", "VI7♭9"], fn: "III", tag: "V of ii" },
+        ],
+        [
+          { n: 9, r: ["IIm7"], fn: "II" },
+          { n: 10, r: ["V7"], fn: "V" },
+          { n: 11, r: ["IIIm7", "VI7"], fn: "III" },
+          { n: 12, r: ["IIm7", "V7"], fn: "II", tag: "iii–VI–ii–V" },
+        ],
+      ],
+    },
+    {
+      id: "tritone",
+      label: "Tritone substitution",
+      note: "♭II7 replaces V7 — descending chromatic bass",
+      rows: [
+        [
+          { n: 1, r: ["I7"], fn: "I" },
+          { n: 2, r: ["IV7"], fn: "IV" },
+          { n: 3, r: ["I7"], fn: "I" },
+          { n: 4, r: ["IIIm7", "I7"], fn: "III", tag: "ii–V" },
+        ],
+        [
+          { n: 5, r: ["IV7"], fn: "IV" },
+          { n: 6, r: ["#IVm7", "♭II7"], fn: "dim", tag: "tritone sub" },
+          { n: 7, r: ["I7", "♭II7"], fn: "I", tag: "chromatic" },
+          { n: 8, r: ["♭II7", "♭VII7"], fn: "IV", tag: "descending" },
+        ],
+        [
+          { n: 9, r: ["IIm7"], fn: "II" },
+          { n: 10, r: ["V7", "♭II7"], fn: "V", tag: "tritone" },
+          { n: 11, r: ["IIIm7", "VI7"], fn: "III" },
+          { n: 12, r: ["IIm7", "V7"], fn: "II", tag: "turnaround" },
+        ],
+      ],
+    },
+    {
+      id: "parker",
+      label: "Charlie Parker blues",
+      note: "'Blues for Alice' — Imaj7 start · descending ii–V chain",
+      rows: [
+        [
+          { n: 1, r: ["Imaj7"], fn: "I", tag: "major 7!" },
+          { n: 2, r: ["VIIø7", "III7♭9"], fn: "III", tag: "ii–V to vi" },
+          { n: 3, r: ["VIm7", "♭VI7"], fn: "VI", tag: "ii–V" },
+          { n: 4, r: ["IIIm7", "I7"], fn: "III", tag: "ii–V to IV" },
+        ],
+        [
+          { n: 5, r: ["IV7"], fn: "IV" },
+          { n: 6, r: ["IVm7", "♭VII7"], fn: "IV", tag: "iv minor" },
+          { n: 7, r: ["IIIm7", "VI7"], fn: "III" },
+          { n: 8, r: ["♭IIIm7", "♭VI7"], fn: "IV", tag: "descending" },
+        ],
+        [
+          { n: 9, r: ["IIm7"], fn: "II" },
+          { n: 10, r: ["V7"], fn: "V" },
+          { n: 11, r: ["Imaj7", "VI7"], fn: "I", tag: "landing" },
+          { n: 12, r: ["IIm7", "V7"], fn: "II", tag: "turnaround" },
+        ],
+      ],
+    },
+  ];
+
+  /**
+   * renderProg(p)
+   * Renders the selected progression to the DOM
+   * - Updates header with progression name and note
+   * - Marks active button
+   * - Generates grid of bar cards with chord data
+   */
+  function renderProg(p) {
+    document.getElementById("hd-name").textContent = p.label;
+    document.getElementById("hd-note").textContent = p.note;
+    document.querySelectorAll(".era-btn").forEach(b => b.classList.toggle("active", b.dataset.id === p.id));
+
+    const grid = document.getElementById("grid");
+    grid.innerHTML = "";
+
+    p.rows.forEach(row => {
+      // Empty spacer div above each row of 4 bars; left without text on
+      // purpose — its only job is the top margin defined by .row-label in CSS
+      const lbl = document.createElement("div");
+      lbl.className = "row-label";
+      grid.appendChild(lbl);
+
+      const rowDiv = document.createElement("div");
+      rowDiv.className = "bar-row";
+      row.forEach(bar => {
+        const el = document.createElement("div");
+        el.className = "bar fn-" + bar.fn;
+        let html = `<div class="b-num">Bar ${bar.n}</div>`;
+        // First roman numeral is styled larger (.b-roman); any additional
+        // ones (a mid-bar chord change) are styled smaller (.b-roman2)
+        bar.r.forEach((rv, i) => {
+          html += `<div class="${i === 0 ? 'b-roman' : 'b-roman2'}">${rv}</div>`;
+        });
+        // Optional annotation (e.g. "turnaround") shown below the numerals
+        if (bar.tag) html += `<div class="b-tag">${bar.tag}</div>`;
+        el.innerHTML = html;
+        rowDiv.appendChild(el);
+      });
+      grid.appendChild(rowDiv);
+    });
+  }
+
+  /**
+   * Initialize tabs and set first progression
+   */
+  const tabs = document.getElementById("tabs");
+  PROGS.forEach(p => {
+    const btn = document.createElement("button");
+    btn.className = "era-btn";
+    btn.dataset.id = p.id;
+    btn.textContent = p.label;
+    btn.onclick = () => renderProg(p);
+    tabs.appendChild(btn);
+  });
+
+  // Display first progression on load
+  renderProg(PROGS[0]);
+</script>
+</body>
+</html>
