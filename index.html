@@ -297,6 +297,46 @@
     background: var(--fret-line);
   }
 
+  /* Bass-clef notation staves, one per string, columns aligned with the fingerboard grid.
+     MuseScore "Jazz" look: Petaluma (SMuFL music font) + Petaluma Script for text,
+     both by Steinberg under the SIL Open Font License (see Jazz/fonts/OFL.txt). */
+  @font-face {
+    font-family: "Petaluma";
+    src: url("Jazz/fonts/Petaluma.woff2") format("woff2");
+    font-display: block;
+  }
+  @font-face {
+    font-family: "Petaluma Script";
+    src: url("Jazz/fonts/PetalumaScript.woff2") format("woff2");
+    font-display: swap;
+  }
+  .notation-board { padding-left: 96px; }
+  .notation-board .string-label { left: -92px; font-family: "Petaluma Script", cursive; font-size: 20px; font-weight: 400; }
+  .notation-board .fret-numbers span { font-family: "Petaluma Script", cursive; font-size: 14px; }
+  .notation-title { font-family: "Petaluma Script", cursive; font-size: 18px !important; text-transform: none !important; letter-spacing: 0 !important; color: var(--text) !important; }
+  .staff-row .smufl { font-family: "Petaluma"; font-size: 32px; } /* 32px = 4 staff spaces of 8px */
+  .staff-row {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(13, 1fr);
+    height: 84px;
+  }
+  .staff-row svg { display: block; overflow: visible; }
+  .staff-clef { position: absolute; left: -50px; top: 0; }
+  .staff-row .staff-line { stroke: var(--string-line); stroke-width: 1; }
+  .staff-row .ledger { stroke: var(--text); stroke-width: 1.6; stroke-linecap: round; }
+  .staff-row .clef, .staff-row .acc, .staff-row .head { fill: var(--text); }
+  .staff-row .head.open { fill: var(--open-dot); }
+  .staff-row .head.root { fill: var(--accent); }
+  .staff-row .head.natural { fill: var(--natural-dot); }
+  .notation-title {
+    font-size: 13px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 28px 0 4px;
+  }
+
   .legend {
     display: flex;
     gap: 22px;
@@ -510,6 +550,17 @@
       <div class="legend-item"><span class="legend-dot" style="background:var(--accent);"></span> String's root note (octave)</div>
       <div class="legend-item"><span class="legend-dot" style="background:var(--natural-dot);"></span> Natural harmonic point (5th, 7th, 12th)</div>
       <div class="legend-item">Numbers = semitones from the nut (equivalent to fret position)</div>
+    </div>
+
+    <h3 class="notation-title">Bass-Clef Notation</h3>
+    <p class="character-line" style="margin-top:0;">The same notes written on the F clef, one staff per string, each column lined up with its position above. Written pitch: the double bass sounds one octave lower than written.</p>
+    <div class="board-scroll">
+      <div class="board notation-board">
+        <div class="fret-numbers">
+          <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span>
+        </div>
+        <div id="notation"></div>
+      </div>
     </div>
   </div>
 
@@ -808,6 +859,78 @@ STRINGS.forEach(s => {
   });
   tbody.appendChild(tr);
 });
+
+/* ---------- BASS-CLEF NOTATION (fingerboard panel) ---------- */
+// Written MIDI pitch of each open string (bass is notated an octave above sounding pitch).
+const OPEN_WRITTEN_MIDI = { E: 40, A: 45, D: 50, G: 55 }; // E2, A2, D3, G3
+const STAFF_HALF = 4;          // px per diatonic step (line spacing = 8px)
+const STAFF_BOTTOM_Y = 64;     // y of the bottom staff line (G2)
+const G2_STEP = LETTER_ORDER.indexOf("G") + 7 * 2;
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+// Diatonic step above the bottom line (G2 = 0, each line/space = 1) plus the sharp flag.
+function staffPosition(midi) {
+  const name = CHROMATIC[midi % 12];
+  const octave = Math.floor(midi / 12) - 1;
+  return { step: LETTER_ORDER.indexOf(name[0]) + 7 * octave - G2_STEP, sharp: name.length > 1 };
+}
+
+function staffLines() {
+  let s = "";
+  for (let l = 0; l < 5; l++) {
+    const y = STAFF_BOTTOM_Y - l * 2 * STAFF_HALF;
+    s += `<line class="staff-line" x1="0" x2="100%" y1="${y}" y2="${y}"/>`;
+  }
+  return s;
+}
+
+function buildNotation() {
+  const container = document.getElementById("notation");
+  STRINGS.forEach(s => {
+    const row = document.createElement("div");
+    row.className = "staff-row";
+    const label = document.createElement("div");
+    label.className = "string-label";
+    label.textContent = s.label;
+    row.appendChild(label);
+
+    // SMuFL fClef (U+E062): its baseline sits on the F3 line (4th line from the bottom).
+    const fLineY = STAFF_BOTTOM_Y - 6 * STAFF_HALF;
+    const clef = document.createElementNS(SVG_NS, "svg");
+    clef.setAttribute("class", "staff-clef");
+    clef.setAttribute("width", "50");
+    clef.setAttribute("height", "84");
+    clef.innerHTML = staffLines() + `<text class="smufl clef" x="6" y="${fLineY}">&#xE062;</text>`;
+    row.appendChild(clef);
+
+    const openMidi = OPEN_WRITTEN_MIDI[s.root];
+    for (let i = 0; i <= 12; i++) {
+      const { step, sharp } = staffPosition(openMidi + i);
+      const y = STAFF_BOTTOM_Y - step * STAFF_HALF;
+      let ledgers = "";
+      for (let l = -2; l >= step; l -= 2) ledgers += `<line class="ledger" x1="-11" x2="11" y1="${STAFF_BOTTOM_Y - l * STAFF_HALF}" y2="${STAFF_BOTTOM_Y - l * STAFF_HALF}"/>`;
+      for (let l = 10; l <= step; l += 2) ledgers += `<line class="ledger" x1="-11" x2="11" y1="${STAFF_BOTTOM_Y - l * STAFF_HALF}" y2="${STAFF_BOTTOM_Y - l * STAFF_HALF}"/>`;
+
+      // Same color coding as the fingerboard dots above.
+      let cls = "head";
+      if (i === 0) cls += " open";
+      else if (i === 12) cls += " root";
+      else if (HARMONIC_POSITIONS.includes(i)) cls += " natural";
+
+      const cell = document.createElementNS(SVG_NS, "svg");
+      cell.setAttribute("width", "100%");
+      cell.setAttribute("height", "84");
+      cell.innerHTML = staffLines() +
+        `<svg x="50%" y="0" overflow="visible">${ledgers}` +
+        // SMuFL accidentalSharp (U+E262) and noteheadWhole (U+E0A2); glyph baseline = pitch line.
+        (sharp ? `<text class="smufl acc" x="-12" y="${y}" text-anchor="end">&#xE262;</text>` : "") +
+        `<text class="smufl ${cls}" x="0" y="${y}" text-anchor="middle">&#xE0A2;</text></svg>`;
+      row.appendChild(cell);
+    }
+    container.appendChild(row);
+  });
+}
+buildNotation();
 
 /* ---------- NATURAL HARMONICS ---------- */
 // The natural-harmonic touch points shown in the table/diagram: fret-equivalent position,
