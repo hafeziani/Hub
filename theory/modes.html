@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Modes of the Major Scale</title>
+<link rel="icon" type="image/png" href="../assets/favicon.png">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/site.css">
+<style>
+  /* Shared tokens, layout, tabs and explorer widgets live in assets/site.css. */
+
+  /* ========== CHORD-SCALE CARDS (one per key) ========== */
+  .key-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .card {
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    padding: 12px 12px 10px;
+    background: var(--bg);
+  }
+  .card-key { font-size: 16px; font-weight: 700; margin-bottom: 10px; }
+  .notes-row { display: flex; gap: 4px; justify-content: space-between; }
+  .note-cell { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .note-bubble {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10.5px; font-weight: 600; line-height: 1;
+  }
+  .note-deg { font-size: 9.5px; color: var(--muted); }
+  .info-row {
+    margin-top: 8px; padding-top: 8px;
+    border-top: 1px solid var(--panel-border);
+    font-size: 11px; color: var(--muted); text-align: center;
+  }
+  .info-row strong { color: var(--text); }
+
+  /* Chord tones (1-3-5-7 of the mode) are colored; the other scale notes are neutral. */
+  .ct-1 { background: #1f49bb; color: #fff; }
+  .ct-3 { background: #18a356; color: #fff; }
+  .ct-5 { background: #d83131; color: #fff; }
+  .ct-7 { background: #e4c82c; color: #3a2e00; }
+  .nb-other { background: var(--panel); border: 1px solid var(--panel-border); color: var(--muted); }
+
+  .ct-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-bottom: 14px; font-size: 12px; color: var(--muted); }
+  .ct-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .ct-legend .note-bubble { width: 20px; height: 20px; font-size: 9px; }
+</style>
+</head>
+<body class="has-sidenav">
+<script src="../assets/nav.js"></script>
+<nav class="sidenav">
+  <div class="sidenav-title">Modes</div>
+  <a href="#modes-panel" data-target="modes-panel">The seven modes</a>
+  <a href="#explorer-panel" data-target="explorer-panel">Mode explorer</a>
+  <a href="#keys-panel" data-target="keys-panel">All 12 keys</a>
+</nav>
+<div class="wrap">
+  <h1>Modes of the Major Scale</h1>
+  <p class="subtitle">Each mode uses the same 7 notes as a major scale, starting from a different degree. That changes the pattern of whole and half steps, so each mode has its own sound and its own 7th chord.</p>
+
+  <div class="panel" id="modes-panel">
+    <h2>The Seven Modes</h2>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th style="text-align:left;">Mode</th><th>Starts on Degree</th><th>Formula</th><th>Character</th></tr>
+        </thead>
+        <tbody id="mode-table-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel" id="explorer-panel">
+    <h2>Mode Explorer</h2>
+    <div class="explorer">
+      <label>Root note
+        <select id="mode-root"></select>
+      </label>
+      <label>Mode
+        <select id="mode-select"></select>
+      </label>
+    </div>
+    <div class="result-strip" id="mode-result"></div>
+    <p class="character-line" id="mode-character"></p>
+    <div class="note-chips" id="mode-chips"></div>
+    <p class="character-line">See any mode on an instrument in the <a href="../instruments/double-bass.html#modes-panel" style="color:var(--accent)">Double Bass</a> or <a href="../instruments/trumpet.html#modes-panel" style="color:var(--accent)">Trumpet</a> chart.</p>
+  </div>
+
+  <div class="panel" id="keys-panel">
+    <h2>Chord-Scales in All 12 Keys</h2>
+    <p class="desc">Every mode in all 12 keys, in circle-of-fifths order. The colored bubbles are the chord tones (1, 3, 5, 7); the grey ones are the other scale notes.</p>
+    <div class="tab-bar" id="mode-tabs"></div>
+    <div class="result-strip" id="keys-formula"></div>
+    <div class="ct-legend" id="ct-legend"></div>
+    <div class="key-grid" id="key-grid"></div>
+  </div>
+</div>
+
+<script src="../assets/theory.js"></script>
+<script>
+// Table + explorer (mode-table-body / mode-root / mode-select / mode-chips) come from theory.js.
+initExplorers();
+
+/* ---------- ALL 12 KEYS ---------- */
+// Roots in circle-of-fifths order. Minor-chord modes use the usual minor-key spellings
+// (C#m7 / G#m7 rather than Dbm7 / Abm7, which would need double flats).
+const CIRCLE_MAJOR = ["C","G","D","A","E","B","F#","Db","Ab","Eb","Bb","F"];
+const CIRCLE_MINOR = ["C","G","D","A","E","B","F#","C#","G#","Eb","Bb","F"];
+const CHORD_TONE_CLASS = { 0: "ct-1", 2: "ct-3", 4: "ct-5", 6: "ct-7" }; // scale-note index -> color
+
+function renderKeys(mode) {
+  document.querySelectorAll("#mode-tabs .tab").forEach(b => b.classList.toggle("active", b.dataset.key === mode.key));
+  const isMinor = mode.degrees.includes("b3");
+  const roots = isMinor ? CIRCLE_MINOR : CIRCLE_MAJOR;
+  const chordDegrees = [0, 2, 4, 6].map(i => mode.degrees[i]);
+
+  document.getElementById("keys-formula").innerHTML =
+    `<span class="notes-list">${mode.label} · ${pretty(mode.chord)}</span>` +
+    `<span class="formula-tag">${pretty(mode.degrees.join(" – "))}</span>` +
+    `<span class="formula-tag">${stepPattern(mode.offsets)}</span>`;
+  document.getElementById("ct-legend").innerHTML = chordDegrees.map((d, i) =>
+    `<span><span class="note-bubble ${CHORD_TONE_CLASS[i * 2]}">${pretty(d === "1" ? "R" : d)}</span>${["Root", "3rd", "5th", "7th"][i]}</span>`
+  ).join("") + `<span><span class="note-bubble nb-other">·</span>Other scale notes</span>`;
+
+  const grid = document.getElementById("key-grid");
+  grid.innerHTML = "";
+  roots.forEach(root => {
+    const notes = mode.offsets.map((o, i) => pretty(spellNote(root, o, numeralFromDegree(mode.degrees[i]))));
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML =
+      `<div class="card-key">${pretty(root)}${pretty(mode.chord)}</div>` +
+      `<div class="notes-row">${notes.map((n, i) => `
+        <div class="note-cell">
+          <div class="note-bubble ${CHORD_TONE_CLASS[i] || "nb-other"}">${n}</div>
+          <div class="note-deg">${pretty(mode.degrees[i])}</div>
+        </div>`).join("")}</div>` +
+      `<div class="info-row">Chord tones: <strong>${[0, 2, 4, 6].map(i => notes[i]).join("–")}</strong></div>`;
+    grid.appendChild(card);
+  });
+}
+
+const modeTabs = document.getElementById("mode-tabs");
+MODES.forEach(m => {
+  const btn = document.createElement("button");
+  btn.className = "tab";
+  btn.dataset.key = m.key;
+  btn.textContent = `${m.label} · ${pretty(m.chord)}`;
+  btn.onclick = () => renderKeys(m);
+  modeTabs.appendChild(btn);
+});
+renderKeys(MODES.find(m => m.key === "mixolydian"));
+</script>
+</body>
+</html>

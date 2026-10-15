@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>12-Bar Blues — Forms in Every Key</title>
+<link rel="icon" type="image/png" href="../assets/favicon.png">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/site.css">
+<style>
+  /* Shared tokens, layout, tabs and explorer widgets live in assets/site.css. */
+
+  /* ========== FORM HEADER ========== */
+  .form-header {
+    margin-bottom: 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--panel-border);
+    background: var(--bg);
+  }
+  .form-name { font-size: 15px; font-weight: 600; }
+  .form-note { font-size: 12.5px; color: var(--muted); margin-top: 3px; font-style: italic; }
+
+  /* ========== LEGEND ========== */
+  .fn-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-bottom: 14px; font-size: 12px; color: var(--muted); }
+  .fn-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .fn-legend i { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+
+  /* ========== BAR GRID ========== */
+  .bar-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  @media (max-width: 600px) { .bar-row { gap: 6px; } }
+
+  /* Individual bar card */
+  .bar {
+    border-radius: 12px;
+    border: 1px solid var(--panel-border);
+    padding: 10px 6px 8px;
+    min-height: 92px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    text-align: center;
+  }
+  .b-num { font-size: 10.5px; font-weight: 600; opacity: .6; margin-bottom: 2px; }
+  /* Roman numerals: the bar's main chord is larger, a mid-bar change is smaller */
+  .b-roman { font-size: 16px; font-weight: 700; line-height: 1.2; }
+  .b-roman2 { font-size: 13px; font-weight: 700; line-height: 1.2; }
+  /* Chord names in the selected key */
+  .b-chord { font-size: 12px; font-weight: 600; font-family: var(--font-mono); opacity: .85; }
+  /* Optional annotation (e.g. "turnaround", "tritone sub") */
+  .b-tag { font-size: 10.5px; font-weight: 600; line-height: 1.2; margin-top: auto; padding-top: 3px; opacity: .75; }
+
+  /* ========== FUNCTIONAL HARMONY COLORS ========== */
+  /* Light mode */
+  .fn-I   { background: #EFF6FF; border-color: #93C5FD; color: #1E40AF; }
+  .fn-IV  { background: #F0FDF4; border-color: #86EFAC; color: #166534; }
+  .fn-V   { background: #FFF7ED; border-color: #FDB37F; color: #9A3412; }
+  .fn-II  { background: #FAF5FF; border-color: #C4B5FD; color: #5B21B6; }
+  .fn-VI  { background: #FFF1F2; border-color: #FCA5A5; color: #991B1B; }
+  .fn-III { background: #ECFDF5; border-color: #6EE7B7; color: #065F46; }
+  .fn-dim { background: #F5F3FF; border-color: #A78BFA; color: #4C1D95; }
+  /* Dark mode (the site default) */
+  @media (prefers-color-scheme: dark) {
+    .fn-I   { background: #1E3A8A; border-color: #3B82F6; color: #BFDBFE; }
+    .fn-IV  { background: #14532D; border-color: #4ADE80; color: #BBF7D0; }
+    .fn-V   { background: #431407; border-color: #FB923C; color: #FED7AA; }
+    .fn-II  { background: #2E1065; border-color: #A78BFA; color: #DDD6FE; }
+    .fn-VI  { background: #450A0A; border-color: #F87171; color: #FECACA; }
+    .fn-III { background: #022C22; border-color: #34D399; color: #A7F3D0; }
+    .fn-dim { background: #2E1065; border-color: #7C3AED; color: #DDD6FE; }
+  }
+</style>
+</head>
+<body>
+<script src="../assets/nav.js"></script>
+<div class="wrap">
+  <h1>12-Bar Blues</h1>
+  <p class="subtitle">Six blues forms, from the basic three-chord blues to Charlie Parker&rsquo;s &ldquo;Blues for Alice&rdquo;. Roman numerals show each chord&rsquo;s function; pick a key to see the actual chord names.</p>
+
+  <div class="panel" id="forms-panel">
+    <h2>Blues Forms</h2>
+    <div class="tab-bar" id="tabs"></div>
+    <div class="explorer">
+      <label>Key
+        <select id="key-select"></select>
+      </label>
+    </div>
+
+    <div class="form-header">
+      <div class="form-name" id="hd-name"></div>
+      <div class="form-note" id="hd-note"></div>
+    </div>
+
+    <div class="fn-legend">
+      <span><i style="background:#3B82F6"></i>I tonic</span>
+      <span><i style="background:#4ADE80"></i>IV subdominant</span>
+      <span><i style="background:#FB923C"></i>V dominant</span>
+      <span><i style="background:#A78BFA"></i>II supertonic</span>
+      <span><i style="background:#F87171"></i>VI submediant</span>
+      <span><i style="background:#34D399"></i>III mediant</span>
+      <span><i style="background:#7C3AED"></i>dim / ø</span>
+    </div>
+
+    <div id="grid"></div>
+  </div>
+
+  <div class="panel" id="scale-panel">
+    <h2>Soloing: Blues Scale</h2>
+    <p class="desc">The blues scale (minor pentatonic + the &flat;5 &ldquo;blue note&rdquo;) works over the whole form. Follows the key selected above.</p>
+    <div class="note-chips" id="blues-scale-chips"></div>
+    <p class="character-line">More scales on the <a href="scales.html" style="color:var(--accent)">Scales</a> page; I/IV/V shown on an instrument in the <a href="../instruments/double-bass.html#blues-panel" style="color:var(--accent)">Double Bass</a> and <a href="../instruments/trumpet.html#blues-panel" style="color:var(--accent)">Trumpet</a> charts.</p>
+  </div>
+</div>
+
+<script src="../assets/theory.js"></script>
+<script>
+  /**
+   * 12-BAR BLUES PROGRESSIONS DATA
+   * Array of 6 different historical and stylistic variations of 12-bar blues in Roman numerals
+   * Each progression contains 3 rows of 4 bars (12 bars total)
+   * Colors correspond to harmonic function: I(blue), IV(green), V(orange), II(purple), VI(red), III(teal), dim(indigo)
+   *
+   * Shape of each progression object:
+   *   id    - unique key used to mark/find the matching tab button
+   *   label - short name shown on the tab and in the header
+   *   note  - one-line description shown under the header label
+   *   rows  - 3 arrays of 4 bar objects; each bar object has:
+   *     n   - bar number (1-12), shown in the "Bar N" label
+   *     r   - array of Roman numeral chord symbols for the bar; a second
+   *           entry means the chord changes partway through the bar
+   *           (e.g. a ii-V within one bar), rendered smaller below the first
+   *     fn  - harmonic-function key, maps to the .fn-* CSS classes for coloring
+   *     tag - optional short annotation printed under the roman numerals
+   */
+  const PROGS = [
+    {
+      id: "basic",
+      label: "Basic blues",
+      note: "All dominant 7ths — no turnaround",
+      rows: [
+        [
+          { n: 1, r: ["I7"], fn: "I" },
+          { n: 2, r: ["I7"], fn: "I" },
+          { n: 3, r: ["I7"], fn: "I" },
+          { n: 4, r: ["I7"], fn: "I" },
+        ],
+        [
+          { n: 5, r: ["IV7"], fn: "IV" },
+          { n: 6, r: ["IV7"], fn: "IV" },
+          { n: 7, r: ["I7"], fn: "I" },
+          { n: 8, r: ["I7"], fn: "I" },
+        ],
+        [
+          { n: 9, r: ["V7"], fn: "V" },
+          { n: 10, r: ["IV7"], fn: "IV" },
+          { n: 11, r: ["I7"], fn: "I" },
+          { n: 12, r: ["I7"], fn: "I" },
+        ],
+      ],
+    },
+    {
+      id: "s1930",
+      label: "1930s evolution",
+      note: "Quick IV in bar 2 · V7 turnaround in bar 12",
+      rows: [
+        [
+          { n: 1, r: ["I7"], fn: "I" },
+          { n: 2, r: ["IV7"], fn: "IV", tag: "quick IV" },
+          { n: 3, r: ["I7"], fn: "I" },
+          { n: 4, r: ["I7"], fn: "I" },
+        ],
+        [
+          { n: 5, r: ["IV7"], fn: "IV" },
+          { n: 6, r: ["IV7"], fn: "IV" },
+          { n: 7, r: ["I7"], fn: "I" },
+          { n: 8, r: ["I7"], fn: "I" },
+        ],
+        [
+          { n: 9, r: ["V7"], fn: "V" },
+          { n: 10, r: ["IV7"], fn: "IV" },
+          { n: 11, r: ["I7"], fn: "I" },
+          { n: 12, r: ["V7"], fn: "V", tag: "turnaround" },
+        ],
+      ],
+    },
+    {
+      id: "basie",
+      label: "Count Basie changes",
+      note: "Diminished passing chords · secondary dominant D7 in bar 8",
+      rows: [
+        [
+          { n: 1, r: ["I7"], fn: "I" },
+          { n: 2, r: ["IV7", "iv°"], fn: "IV", tag: "passing dim" },
+          { n: 3, r: ["I7", "IIm7"], fn: "I", tag: "chromatic" },
+          { n: 4, r: ["I7"], fn: "I" },
+        ],
+        [
+          { n: 5, r: ["IV7"], fn: "IV" },
+          { n: 6, r: ["iv°"], fn: "dim", tag: "passing dim" },
+          { n: 7, r: ["I7"], fn: "I" },
+          { n: 8, r: ["VI7"], fn: "VI", tag: "V of ii" },
+        ],
+        [
+          { n: 9, r: ["V7"], fn: "V" },
+          { n: 10, r: ["IV7"], fn: "IV" },
+          { n: 11, r: ["I7"], fn: "I" },
+          { n: 12, r: ["V7"], fn: "V", tag: "turnaround" },
+        ],
+      ],
+    },
+    {
+      id: "bebop",
+      label: "Bebop changes",
+      note: "ii–V motion throughout · #iv° passing · iii–VI–ii–V turnaround",
+      rows: [
+        [
+          { n: 1, r: ["I7"], fn: "I" },
+          { n: 2, r: ["IV7"], fn: "IV" },
+          { n: 3, r: ["I7"], fn: "I" },
+          { n: 4, r: ["IIIm7", "I7"], fn: "III", tag: "ii–V to IV" },
+        ],
+        [
+          { n: 5, r: ["IV7"], fn: "IV" },
+          { n: 6, r: ["#iv°"], fn: "dim", tag: "passing dim" },
+          { n: 7, r: ["I7"], fn: "I" },
+          { n: 8, r: ["IIIm7", "VI7♭9"], fn: "III", tag: "V of ii" },
+        ],
+        [
+          { n: 9, r: ["IIm7"], fn: "II" },
+          { n: 10, r: ["V7"], fn: "V" },
+          { n: 11, r: ["IIIm7", "VI7"], fn: "III" },
+          { n: 12, r: ["IIm7", "V7"], fn: "II", tag: "iii–VI–ii–V" },
+        ],
+      ],
+    },
+    {
+      id: "tritone",
+      label: "Tritone substitution",
+      note: "♭II7 replaces V7 — descending chromatic bass",
+      rows: [
+        [
+          { n: 1, r: ["I7"], fn: "I" },
+          { n: 2, r: ["IV7"], fn: "IV" },
+          { n: 3, r: ["I7"], fn: "I" },
+          { n: 4, r: ["IIIm7", "I7"], fn: "III", tag: "ii–V" },
+        ],
+        [
+          { n: 5, r: ["IV7"], fn: "IV" },
+          { n: 6, r: ["#IVm7", "♭II7"], fn: "dim", tag: "tritone sub" },
+          { n: 7, r: ["I7", "♭II7"], fn: "I", tag: "chromatic" },
+          { n: 8, r: ["♭II7", "♭VII7"], fn: "IV", tag: "descending" },
+        ],
+        [
+          { n: 9, r: ["IIm7"], fn: "II" },
+          { n: 10, r: ["V7", "♭II7"], fn: "V", tag: "tritone" },
+          { n: 11, r: ["IIIm7", "VI7"], fn: "III" },
+          { n: 12, r: ["IIm7", "V7"], fn: "II", tag: "turnaround" },
+        ],
+      ],
+    },
+    {
+      id: "parker",
+      label: "Charlie Parker blues",
+      note: "'Blues for Alice' — Imaj7 start · descending ii–V chain",
+      rows: [
+        [
+          { n: 1, r: ["Imaj7"], fn: "I", tag: "major 7!" },
+          { n: 2, r: ["VIIø7", "III7♭9"], fn: "III", tag: "ii–V to vi" },
+          { n: 3, r: ["VIm7", "♭VI7"], fn: "VI", tag: "ii–V" },
+          { n: 4, r: ["IIIm7", "I7"], fn: "III", tag: "ii–V to IV" },
+        ],
+        [
+          { n: 5, r: ["IV7"], fn: "IV" },
+          { n: 6, r: ["IVm7", "♭VII7"], fn: "IV", tag: "iv minor" },
+          { n: 7, r: ["IIIm7", "VI7"], fn: "III" },
+          { n: 8, r: ["♭IIIm7", "♭VI7"], fn: "IV", tag: "descending" },
+        ],
+        [
+          { n: 9, r: ["IIm7"], fn: "II" },
+          { n: 10, r: ["V7"], fn: "V" },
+          { n: 11, r: ["Imaj7", "VI7"], fn: "I", tag: "landing" },
+          { n: 12, r: ["IIm7", "V7"], fn: "II", tag: "turnaround" },
+        ],
+      ],
+    },
+  ];
+
+  // Major-scale offset of each Roman numeral degree (I..VII).
+  const ROMAN_DEGREES = ["I","II","III","IV","V","VI","VII"];
+  const MAJOR_OFFSETS = [0, 2, 4, 5, 7, 9, 11];
+
+  /**
+   * chordInKey("♭II7", "C") -> "D♭7"
+   * Splits a Roman-numeral chord symbol into accidental + numeral + quality,
+   * spells the root in the given key and re-attaches the quality.
+   */
+  function chordInKey(symbol, key) {
+    const m = symbol.match(/^([♭b#♯]?)(VII|VI|IV|V|III|II|I|vii|vi|iv|v|iii|ii|i)(.*)$/);
+    if (!m) return symbol;
+    const numeral = ROMAN_DEGREES.indexOf(m[2].toUpperCase()) + 1;
+    const shift = /[♭b]/.test(m[1]) ? -1 : m[1] ? 1 : 0;
+    const root = spellNote(key, MAJOR_OFFSETS[numeral - 1] + shift, numeral);
+    return pretty(SIMPLE_ROOT[root] || root) + m[3];
+  }
+  // Chord roots are read by players, so awkward spellings become their common enharmonic (Cb7 -> B7).
+  const SIMPLE_ROOT = { Cb: "B", Fb: "E", "E#": "F", "B#": "C" };
+  ["C","D","E","F","G","A","B"].forEach(l => {
+    SIMPLE_ROOT[l + "bb"] = CHROMATIC[(idx(l) + 10) % 12];
+    SIMPLE_ROOT[l + "##"] = CHROMATIC[(idx(l) + 2) % 12];
+  });
+
+  let currentProg = PROGS[0];
+  const keySelect = document.getElementById("key-select");
+  populateSelect(keySelect, KEY_NAMES);
+  keySelect.value = "C";
+
+  /**
+   * renderProg(p)
+   * Renders the selected progression: header, active tab, and the 3 rows of 4 bar cards
+   * (Roman numerals + chord names in the selected key + optional annotation).
+   */
+  function renderProg(p) {
+    currentProg = p;
+    const key = keySelect.value;
+    document.getElementById("hd-name").textContent = `${p.label} in ${pretty(key)}`;
+    document.getElementById("hd-note").textContent = p.note;
+    document.querySelectorAll("#tabs .tab").forEach(b => b.classList.toggle("active", b.dataset.id === p.id));
+
+    const grid = document.getElementById("grid");
+    grid.innerHTML = "";
+    p.rows.forEach(row => {
+      const rowDiv = document.createElement("div");
+      rowDiv.className = "bar-row";
+      row.forEach(bar => {
+        const el = document.createElement("div");
+        el.className = "bar fn-" + bar.fn;
+        let html = `<div class="b-num">Bar ${bar.n}</div>`;
+        bar.r.forEach((rv, i) => {
+          html += `<div class="${i === 0 ? "b-roman" : "b-roman2"}">${rv}</div>`;
+        });
+        html += `<div class="b-chord">${bar.r.map(rv => chordInKey(rv, key)).join(" · ")}</div>`;
+        if (bar.tag) html += `<div class="b-tag">${bar.tag}</div>`;
+        el.innerHTML = html;
+        rowDiv.appendChild(el);
+      });
+      grid.appendChild(rowDiv);
+    });
+
+    const blues = SCALES.find(s => s.key === "blues");
+    renderNoteChips(document.getElementById("blues-scale-chips"), key,
+      blues.offsets.map((o, i) => ({ offset: o, numeral: numeralFromDegree(blues.degrees[i]), label: blues.degrees[i] })));
+  }
+
+  const tabs = document.getElementById("tabs");
+  PROGS.forEach(p => {
+    const btn = document.createElement("button");
+    btn.className = "tab";
+    btn.dataset.id = p.id;
+    btn.textContent = p.label;
+    btn.onclick = () => renderProg(p);
+    tabs.appendChild(btn);
+  });
+  keySelect.addEventListener("change", () => renderProg(currentProg));
+
+  renderProg(PROGS[0]);
+</script>
+</body>
+</html>

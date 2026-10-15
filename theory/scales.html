@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scales</title>
+<link rel="icon" type="image/png" href="../assets/favicon.png">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/site.css">
+<style>
+  /* Shared tokens, layout and explorer widgets live in assets/site.css. */
+  .panel td.notes { text-align: left; font-weight: 600; white-space: nowrap; }
+</style>
+</head>
+<body class="has-sidenav">
+<script src="../assets/nav.js"></script>
+<nav class="sidenav">
+  <div class="sidenav-title">Scales</div>
+  <a href="#overview-panel" data-target="overview-panel">Overview</a>
+  <a href="#scales-panel" data-target="scales-panel">Scale explorer</a>
+  <a href="#keys-panel" data-target="keys-panel">All 12 keys</a>
+</nav>
+<div class="wrap">
+  <h1>Scales</h1>
+  <p class="subtitle">The main scales used in jazz and blues: their formula, step pattern and notes in any key. For the seven modes of the major scale see <a href="modes.html">Modes</a>.</p>
+
+  <div class="panel" id="overview-panel">
+    <h2>Overview</h2>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th style="text-align:left;">Scale</th><th>Formula</th><th>Steps</th><th style="text-align:left;">Use</th></tr>
+        </thead>
+        <tbody id="scale-table-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel" id="scales-panel">
+    <h2>Scale Explorer</h2>
+    <div class="explorer">
+      <label>Root note
+        <select id="scale-root"></select>
+      </label>
+      <label>Scale
+        <select id="scale-select"></select>
+      </label>
+    </div>
+    <div class="result-strip" id="scale-result"></div>
+    <div class="note-chips" id="scale-chips"></div>
+    <p class="character-line">See it on an instrument in the <a href="../instruments/double-bass.html#scales-panel" style="color:var(--accent)">Double Bass</a> or <a href="../instruments/trumpet.html#scales-panel" style="color:var(--accent)">Trumpet</a> chart.</p>
+  </div>
+
+  <div class="panel" id="keys-panel">
+    <h2>All 12 Keys</h2>
+    <p class="desc">The scale selected above, in every key (circle-of-fifths order).</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th style="text-align:left;">Key</th><th style="text-align:left;">Notes</th></tr></thead>
+        <tbody id="keys-table-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/theory.js"></script>
+<script>
+const scaleTableBody = document.getElementById("scale-table-body");
+SCALES.forEach(s => {
+  const tr = document.createElement("tr");
+  tr.innerHTML = `<td class="name-cell">${s.label}</td><td style="font-family:var(--font-mono);white-space:nowrap">${pretty(s.degrees.join(" "))}</td><td style="font-family:var(--font-mono);white-space:nowrap">${stepPattern(s.offsets)}</td><td class="left">${pretty(s.use)}</td>`;
+  scaleTableBody.appendChild(tr);
+});
+
+// Explorer (scale-root / scale-select / scale-chips) comes from theory.js.
+initExplorers();
+
+const CIRCLE = ["C","G","D","A","E","B","F#","Db","Ab","Eb","Bb","F"];
+const scaleSelect = document.getElementById("scale-select");
+function renderAllKeys() {
+  const scale = SCALES.find(s => s.key === scaleSelect.value);
+  // Minor-type scales read better from the sharp-side minor keys (C#, G#) than Db/Ab.
+  const roots = scale.degrees.includes("b3") ? CIRCLE.map(k => ({ Db: "C#", Ab: "G#" }[k] || k)) : CIRCLE;
+  document.getElementById("keys-table-body").innerHTML = roots.map(root => {
+    const notes = scale.offsets.map((o, i) => pretty(spellNote(root, o, numeralFromDegree(scale.degrees[i]))));
+    return `<tr><td class="name-cell">${pretty(root)}</td><td class="notes">${notes.join(" – ")}</td></tr>`;
+  }).join("");
+}
+scaleSelect.addEventListener("change", renderAllKeys);
+renderAllKeys();
+</script>
+</body>
+</html>

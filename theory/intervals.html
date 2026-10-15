@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Intervals</title>
+<link rel="icon" type="image/png" href="../assets/favicon.png">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<script src="../assets/nav.js"></script>
+<div class="wrap">
+  <h1>Intervals</h1>
+  <p class="subtitle">An interval is the distance between two notes, counted in semitones. Every scale, mode and chord is a set of intervals stacked on a root.</p>
+
+  <div class="panel" id="intervals-panel">
+    <h2>Interval Table</h2>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Semitones</th><th>Interval Name</th><th>Short</th><th>Example from C</th></tr>
+        </thead>
+        <tbody id="interval-table-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel" id="finder-panel">
+    <h2>Interval Finder</h2>
+    <div class="explorer">
+      <label>Root note
+        <select id="interval-root"></select>
+      </label>
+      <label>Interval
+        <select id="interval-select"></select>
+      </label>
+    </div>
+    <div class="result-strip" id="interval-result"></div>
+    <div class="note-chips" id="interval-chips"></div>
+    <p class="character-line">See it on an instrument in the <a href="../instruments/double-bass.html#intervals-panel" style="color:var(--accent)">Double Bass</a> or <a href="../instruments/trumpet.html#intervals-panel" style="color:var(--accent)">Trumpet</a> chart.</p>
+  </div>
+</div>
+
+<script src="../assets/theory.js"></script>
+<script>
+// Table + finder come from theory.js.
+initExplorers();
+</script>
+</body>
+</html>

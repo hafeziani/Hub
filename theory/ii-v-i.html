@@ -1,232 +1,115 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ii–V–I in All 12 Keys</title>
+<link rel="icon" type="image/png" href="../assets/favicon.png">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="stylesheet" href="../assets/site.css">
 <!--
-  ii7 – V7 – I7 chord-scale reference poster (all 12 keys)
+  ii7 – V7 – Imaj7 chord-scale reference (all 12 keys)
 
-  What this is: a one-page cheat sheet for the jazz ii-V-I progression,
-  printed once per key for all 12 keys, arranged in circle-of-fifths
-  order (C, G, D, A, E, B, Gb, Db, Ab, Eb, Bb, F). For every key it shows
-  the same 7 diatonic notes viewed from 3 different starting points:
-    - ii7  -> Dorian mode   (built from the 2nd degree)
-    - V7   -> Mixolydian mode (built from the 5th degree)
-    - I7   -> Ionian mode   (the major scale itself, built from the 1st degree)
-  Chord tones (the "pillars": root/3rd-or-b3rd/5th/7th-or-b7th) are drawn
-  as colored bubbles; the remaining scale notes ("gaps"/fillers) are grey.
+  For every key, in circle-of-fifths order, it shows the same 7 diatonic notes
+  viewed from 3 different starting points:
+    - ii7   -> Dorian mode     (built from the 2nd degree)
+    - V7    -> Mixolydian mode (built from the 5th degree)
+    - Imaj7 -> Ionian mode     (the major scale itself)
+  Chord tones (root/3rd/5th/7th) are colored bubbles; the other scale notes are grey.
 -->
 <style>
-  /* ── RESET ── */
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  /* ── PRINT SETUP: force A3 portrait page size when printed ── */
-  @page {
-    size: A3 portrait;
-    margin: 18mm;
-  }
-
-  html, body {
-    min-height: 100%;
-  }
-
-  /* ── CSS VARIABLES: shared text/border/background colors ── */
-  :root {
-    --color-text-primary: #1a1612;
-    --color-text-secondary: #6b7280;
-    --color-text-tertiary: #9ca3af;
-    --color-border: #e5e7eb;
-    --color-border-light: #f0ede8;
-    --bg-poster: #f6f5f1;
-    --bg-card: #ffffff;
-    --bg-secondary: #f9f8f4;
-  }
-
-  /* ── BODY LAYOUT: center the poster on the page ── */
-  body {
-    background: var(--bg-poster);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 0;
-  }
-
-  /* ── POSTER CONTAINER: the A3-proportioned page itself ── */
-  .poster {
-    font-family: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background: var(--bg-poster);
-    width: 297mm;
-    min-height: 420mm;
-    max-width: 100%;
-    margin: 0 auto;
-    padding: 16mm;
-  }
-
-  /* ── HEADER ── */
-  .poster-title {
-    text-align: center;
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--color-text-primary);
-    margin-bottom: 3px;
-  }
-  .poster-subtitle {
-    text-align: center;
-    font-size: 9.5px;
-    color: var(--color-text-secondary);
-    letter-spacing: 0.08em;
-    margin-bottom: 10px;
-  }
+  /* Shared tokens, layout and site menu live in assets/site.css. */
+  .wrap { max-width: 1200px; }
 
   /* ── LEGEND ── */
-  .legend {
-    display: flex;
-    justify-content: center;
-    gap: 14px;
-    margin-bottom: 10px;
-    padding: 6px 0;
-    border-top: 1px solid var(--color-border-light);
-    border-bottom: 1px solid var(--color-border-light);
-  }
-  .leg-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--color-text-secondary); }
+  .ivi-legend { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-bottom: 16px; }
+  .leg-item { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); }
   .leg-dot  { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; flex-shrink: 0; }
 
-  /* ── MAIN GRID: 3 cols (one per key-group of 4) → actually 4 cols ── */
+  /* ── MAIN GRID: one card per key ── */
   .keys-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 8px;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 10px;
   }
-
-  /* ── KEY CARD: one rounded card per key, containing the key label
-     plus its ii7/V7/I7 chord blocks stacked vertically ── */
   .key-card {
-    background: var(--bg-card);
-    border: 1px solid rgba(0,0,0,0.08);
+    background: var(--bg);
+    border: 1px solid var(--panel-border);
     border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(15,23,42,0.07);
-    padding: 9px 9px 8px;
+    padding: 10px 10px 9px;
     display: flex;
     flex-direction: column;
     gap: 6px;
   }
-
   .key-label {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
-    color: var(--color-text-primary);
-    border-bottom: 1px solid var(--color-border-light);
+    border-bottom: 1px solid var(--panel-border);
     padding-bottom: 5px;
     display: flex;
     align-items: baseline;
     justify-content: space-between;
   }
-  .key-sig { font-size: 9px; font-weight: 400; color: var(--color-text-tertiary); }
+  .key-sig { font-size: 11px; font-weight: 400; color: var(--muted); }
 
   /* ── CHORD ROW (ii / V / I) ── */
-  .chord-block {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-  }
-
-  .chord-row-label {
-    font-size: 8px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    color: var(--color-text-tertiary);
-    margin-bottom: 1px;
-  }
-
-  .chord-row-label.lbl-ii { color: #6d28d9; }
-  .chord-row-label.lbl-v  { color: #b45309; }
-  .chord-row-label.lbl-i  { color: #065f46; }
-
-  .notes-row {
-    display: flex;
-    gap: 3px;
-    justify-content: space-between;
-  }
-
-  .note-cell {
-    flex: 1; min-width: 0;
-    display: flex; flex-direction: column; align-items: center; gap: 2px;
-  }
-
-  /* base circle shape/size for every note; the actual fill color per
-     scale degree comes from the nb-* classes in "BUBBLE COLORS" below */
+  .chord-block { display: flex; flex-direction: column; gap: 3px; }
+  .chord-row-label { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; margin-bottom: 1px; }
+  .chord-row-label.lbl-ii { color: #8b5cf6; }
+  .chord-row-label.lbl-v  { color: #d97706; }
+  .chord-row-label.lbl-i  { color: #0d9488; }
+  .notes-row { display: flex; gap: 3px; justify-content: space-between; }
+  .note-cell { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; }
   .note-bubble {
-    width: 24px; height: 24px;
+    width: 26px; height: 26px;
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 9px; font-weight: 600; line-height: 1;
+    font-size: 9.5px; font-weight: 600; line-height: 1;
     flex-shrink: 0;
   }
+  /* scale-filler notes (non-chord tones) */
+  .nb-other { background: var(--panel); border: 1px solid var(--panel-border); color: var(--muted); }
+  .note-deg { font-size: 8.5px; color: var(--muted); text-align: center; }
+  .chord-sep { border: none; border-top: 1px dashed var(--panel-border); margin: 0; }
 
-  /* default/fallback bubble style for scale-filler notes (non-chord tones) */
-  .nb-other { background: #f0efe9; border: 1px solid rgba(0,0,0,0.08); color: var(--color-text-secondary); }
-
-  .note-deg { font-size: 7.5px; color: var(--color-text-tertiary); text-align: center; }
-
-  .chord-name-row {
-    font-size: 9px;
-    font-weight: 600;
-    color: var(--color-text-tertiary);
-    text-align: center;
-    letter-spacing: 0.02em;
-  }
-
-  /* separator between chords */
-  .chord-sep {
-    border: none;
-    border-top: 1px dashed var(--color-border-light);
-  }
-
-  /* ── BUBBLE COLORS: chord-tone colors per role, assigned by nbClass() in the
-     JS below (1/root, 3rd or ♭3rd, 5th, 7th or ♭7th all get their own color) ── */
-  /* ii (Dorian): purple */
+  /* ── BUBBLE COLORS: chord-tone colors per role, assigned by nbClass() ── */
+  /* ii (Dorian) */
   .nb-ii-1  { background: #7C3AED; color: #fff; }
   .nb-ii-b3 { background: #a78bfa; color: #fff; }
   .nb-ii-5  { background: #d83131; color: #fff; }
   .nb-ii-b7 { background: #e4c82c; color: #3a2e00; }
-  /* V (Mixolydian): amber */
+  /* V (Mixolydian) */
   .nb-v-1   { background: #1f49bb; color: #fff; }
   .nb-v-3   { background: #18a356; color: #fff; }
   .nb-v-5   { background: #d83131; color: #fff; }
   .nb-v-b7  { background: #e4c82c; color: #3a2e00; }
-  /* I (Ionian): teal */
+  /* I (Ionian) */
   .nb-i-1   { background: #0f766e; color: #fff; }
   .nb-i-3   { background: #18a356; color: #fff; }
   .nb-i-5   { background: #d83131; color: #fff; }
   .nb-i-7   { background: #e4c82c; color: #3a2e00; }
-
-  /* ── FOOTER ── */
-  .footer {
-    margin-top: 10px;
-    padding-top: 8px;
-    border-top: 1px solid var(--color-border-light);
-    text-align: center;
-    font-size: 8.5px;
-    color: var(--color-text-tertiary);
-    letter-spacing: 0.05em;
-  }
 </style>
+</head>
+<body>
+<script src="../assets/nav.js"></script>
+<div class="wrap">
+  <h1>ii–V–I in All 12 Keys</h1>
+  <p class="subtitle">The chord-scale system for the most common jazz progression: ii7 uses Dorian, V7 uses Mixolydian and Imaj7 uses Ionian. All three come from the same 7 notes, starting on different degrees. More about each mode on the <a href="modes.html">Modes</a> page.</p>
 
-<div class="poster">
-  <div class="poster-title">ii7 – V7 – I7 &nbsp;·&nbsp; All 12 Keys</div>
-  <div class="poster-subtitle">CHORD-SCALE SYSTEM · CIRCLE OF FIFTHS ORDER · DORIAN · MIXOLYDIAN · IONIAN</div>
+  <div class="panel">
+    <h2>Circle of Fifths Order</h2>
+    <!-- LEGEND: what each bubble color means for ii7/V7/Imaj7 -->
+    <div class="ivi-legend">
+      <div class="leg-item"><div class="leg-dot nb-ii-1">R</div><div class="leg-dot nb-ii-b3">♭3</div><div class="leg-dot nb-ii-5">5</div><div class="leg-dot nb-ii-b7">♭7</div>&nbsp;ii7 Dorian</div>
+      <div class="leg-item"><div class="leg-dot nb-v-1">R</div><div class="leg-dot nb-v-3">3</div><div class="leg-dot nb-v-5">5</div><div class="leg-dot nb-v-b7">♭7</div>&nbsp;V7 Mixolydian</div>
+      <div class="leg-item"><div class="leg-dot nb-i-1">R</div><div class="leg-dot nb-i-3">3</div><div class="leg-dot nb-i-5">5</div><div class="leg-dot nb-i-7">7</div>&nbsp;Imaj7 Ionian</div>
+    </div>
 
-  <!-- LEGEND: static key showing what each bubble color means for ii7/V7/I7 -->
-  <div class="legend">
-    <div class="leg-item"><div class="leg-dot nb-ii-1">R</div><div class="leg-dot nb-ii-b3">♭3</div><div class="leg-dot nb-ii-5">5</div><div class="leg-dot nb-ii-b7">♭7</div>&nbsp;ii7 Dorian</div>
-    <div class="leg-item"><div class="leg-dot nb-v-1">R</div><div class="leg-dot nb-v-3">3</div><div class="leg-dot nb-v-5">5</div><div class="leg-dot nb-v-b7">♭7</div>&nbsp;V7 Mixolydian</div>
-    <div class="leg-item"><div class="leg-dot nb-i-1">R</div><div class="leg-dot nb-i-3">3</div><div class="leg-dot nb-i-5">5</div><div class="leg-dot nb-i-7">7</div>&nbsp;I7 Ionian</div>
+    <!-- Filled by the script below with one .key-card per entry in KEYS -->
+    <div class="keys-grid" id="grid"></div>
   </div>
 
-  <!-- GRID CONTAINER: empty on load; the script below fills this with one
-       .key-card per entry in the KEYS array -->
-  <div class="keys-grid" id="grid"></div>
-
-  <!-- FOOTER: legend for the bubble/grey color convention used in every card -->
-  <div class="footer">
-    Highlighted bubbles = chord tones (pillars) &nbsp;·&nbsp; grey = scale fillers (gaps) &nbsp;·&nbsp; same 7 diatonic notes per key, 3 different starting points
-  </div>
+  <footer>Colored bubbles = chord tones · grey = other scale notes · the same 7 notes per key, from 3 different starting points</footer>
 </div>
 
 <script>
@@ -360,8 +243,10 @@ KEYS.forEach(k => {
     <hr class="chord-sep">
     ${buildChordBlock(k.v,  'v',  'V7')}
     <hr class="chord-sep">
-    ${buildChordBlock(k.i,  'i',  'I7')}
+    ${buildChordBlock(k.i,  'i',  'Imaj7')}
   `;
   grid.appendChild(card);
 });
 </script>
+</body>
+</html>

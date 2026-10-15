@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Music Theory</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .section-title {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    font-weight: 600;
+    margin: 32px 0 12px;
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
+  }
+  .card {
+    display: block;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 14px;
+    padding: 20px;
+    color: var(--text);
+    text-decoration: none;
+    transition: border-color .15s, transform .15s;
+  }
+  .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .card h3 { margin: 0 0 6px; font-size: 17px; }
+  .card p { margin: 0; font-size: 13.5px; color: var(--muted); line-height: 1.5; }
+  .card .tag {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-radius: 6px;
+    padding: 2px 8px;
+    margin-bottom: 10px;
+  }
+</style>
+</head>
+<body>
+<script src="assets/nav.js"></script>
+<div class="wrap">
+  <h1>Music Theory</h1>
+  <p class="subtitle">Scales, modes, blues forms and intervals, plus fingering charts for double bass and trumpet.</p>
+
+  <div class="section-title">Theory</div>
+  <div class="cards">
+    <a class="card" href="theory/scales.html">
+      <span class="tag">1 2 ♭3 4 5 ♭6 ♭7</span>
+      <h3>Scales</h3>
+      <p>Major, the three minors, pentatonics and the blues scale: formulas, step patterns and all 12 keys.</p>
+    </a>
+    <a class="card" href="theory/modes.html">
+      <span class="tag">Dorian · Mixolydian · …</span>
+      <h3>Modes</h3>
+      <p>The seven modes of the major scale, a mode explorer, and every mode as a chord-scale in all 12 keys.</p>
+    </a>
+    <a class="card" href="theory/blues.html">
+      <span class="tag">I7 · IV7 · V7</span>
+      <h3>12-Bar Blues</h3>
+      <p>Six blues forms from basic to bebop and Parker, in Roman numerals and in any key.</p>
+    </a>
+    <a class="card" href="theory/intervals.html">
+      <span class="tag">m3 · P5 · M7</span>
+      <h3>Intervals</h3>
+      <p>Every interval up to the octave, with an interval finder.</p>
+    </a>
+    <a class="card" href="theory/ii-v-i.html">
+      <span class="tag">Dm7 · G7 · Cmaj7</span>
+      <h3>ii–V–I</h3>
+      <p>The chord-scale system for the ii–V–I progression in all 12 keys.</p>
+    </a>
+  </div>
+
+  <div class="section-title">Instruments</div>
+  <div class="cards">
+    <a class="card" href="instruments/double-bass.html">
+      <span class="tag">E · A · D · G</span>
+      <h3>Double Bass</h3>
+      <p>Fingerboard note map, bass-clef notation, natural harmonics, and scales, modes and blues on the neck.</p>
+    </a>
+    <a class="card" href="instruments/trumpet.html">
+      <span class="tag">B♭ · F♯3–C6</span>
+      <h3>Trumpet</h3>
+      <p>Valve fingering chart, overtone series, and scales, modes and blues across the range.</p>
+    </a>
+  </div>
+
+  <div class="section-title">History</div>
+  <div class="cards">
+    <a class="card" href="history/jazz-history.html">
+      <span class="tag">1890s → today</span>
+      <h3>A Schematic History of Jazz</h3>
+      <p>Era by era, with the key figures and albums worth hearing, plus a 15-album starter path.</p>
+    </a>
+  </div>
+</div>
+</body>
+</html>
