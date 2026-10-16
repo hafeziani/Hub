@@ -104,6 +104,12 @@ const SCALES = [
   { key: "majpent", label: "Major Pentatonic", offsets: [0,2,4,7,9], degrees: ["1","2","3","5","6"], use: "Five notes, no half steps — safe over major chords." },
   { key: "minpent", label: "Minor Pentatonic", offsets: [0,3,5,7,10], degrees: ["1","b3","4","5","b7"], use: "The core rock/blues soloing scale." },
   { key: "blues", label: "Blues Scale", offsets: [0,3,5,6,7,10], degrees: ["1","b3","4","b5","5","b7"], use: "Minor pentatonic plus the b5 \"blue note\"." },
+  // Bebop scales: a 7-note scale plus one chromatic passing tone, so a run of eighth notes
+  // starting on a chord tone keeps the chord tones on the downbeats.
+  { key: "bebopdom", label: "Bebop Dominant", offsets: [0,2,4,5,7,9,10,11], degrees: ["1","2","3","4","5","6","b7","7"], use: "Mixolydian plus a passing major 7th; the classic bebop line over 7 chords." },
+  { key: "bebopmaj", label: "Bebop Major", offsets: [0,2,4,5,7,8,9,11], degrees: ["1","2","3","4","5","b6","6","7"], use: "Major plus a passing b6 (C6 + Bdim7 in C); for maj7 and 6 chords." },
+  { key: "bebopdor", label: "Bebop Dorian", offsets: [0,2,3,4,5,7,9,10], degrees: ["1","2","b3","3","4","5","6","b7"], use: "Dorian plus a passing major 3rd; for m7 chords and the ii of a ii–V." },
+  { key: "bebopmelmin", label: "Bebop Melodic Minor", offsets: [0,2,3,5,7,8,9,11], degrees: ["1","2","b3","4","5","b6","6","7"], use: "Melodic minor plus a passing b6; for m6 and m(maj7) chords." },
 ];
 
 /* ---------- MODES ---------- */

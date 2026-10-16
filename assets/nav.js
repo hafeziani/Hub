@@ -28,7 +28,7 @@
   const brand = document.createElement("a");
   brand.className = "brand";
   brand.href = new URL("index.html", root).href;
-  brand.innerHTML = `<img src="${new URL("assets/favicon.svg", root).href}" alt="">Music Theory`;
+  brand.innerHTML = `<span class="logo"></span>Music Theory`;
   nav.appendChild(brand);
 
   SECTIONS.forEach(s => {

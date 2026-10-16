@@ -3,9 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>A Schematic History of Jazz</title>
+<title>The History of Jazz</title>
 <link rel="icon" type="image/png" href="../assets/favicon.png">
-<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
 <link rel="stylesheet" href="../assets/site.css">
 <style>
   /* Shared tokens, layout, site menu and sidenav live in assets/site.css. */
@@ -19,6 +18,11 @@
     padding: 3px 10px;
     border-radius: 999px;
     margin-bottom: 10px;
+  }
+  .era-num {
+    color: var(--muted);
+    font-weight: 600;
+    margin-right: 6px;
   }
   /* Era headings are titles, not the small uppercase section labels used elsewhere. */
   .panel h2 {
@@ -35,12 +39,14 @@
     line-height: 1.6;
     margin: 0 0 14px;
   }
+  .panel p.desc:last-child { margin-bottom: 0; }
   .figures {
     font-size: 13px;
     color: var(--text);
     margin: 0 0 20px;
     line-height: 1.6;
   }
+  .figures:last-child { margin-bottom: 0; }
   .figures .label {
     font-weight: 700;
     color: var(--muted);
@@ -48,6 +54,99 @@
     font-size: 11px;
     letter-spacing: 0.05em;
     margin-right: 8px;
+  }
+
+  /* ========== CENTRAL IDEA (lead panel) ========== */
+  .panel.lead {
+    border-left: 3px solid var(--accent);
+  }
+  .panel.lead p.desc {
+    font-size: 15px;
+    color: var(--text);
+  }
+
+  /* ========== FIVE IDEAS ========== */
+  .ideas {
+    list-style: none;
+    counter-reset: idea;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 14px;
+  }
+  .ideas li {
+    counter-increment: idea;
+    position: relative;
+    padding-left: 38px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+  .ideas li::before {
+    content: counter(idea);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .ideas li strong { color: var(--text); }
+  .lineage {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .lineage span {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--text);
+    border: 1px solid var(--panel-border);
+    border-radius: 999px;
+    padding: 2px 10px;
+  }
+  .lineage i {
+    font-style: normal;
+    color: var(--accent);
+    font-size: 12px;
+  }
+
+  /* ========== SUGGESTED LISTENING ========== */
+  .tracks {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+  }
+  .track {
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .track .style {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .track .name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-top: 2px;
+  }
+  .track .by {
+    font-size: 12px;
+    color: var(--muted);
   }
 
   /* ========== ALBUM GRID ========== */
@@ -149,31 +248,47 @@
 <body class="has-sidenav">
 <script src="../assets/nav.js"></script>
 
+<!-- The era links are appended by the script from the ERAS array. -->
 <nav class="sidenav" id="sidenav">
   <div class="sidenav-title">History of Jazz</div>
-  <a href="#roots" data-target="roots">Roots</a>
-  <a href="#neworleans" data-target="neworleans">New Orleans &amp; Dixieland</a>
-  <a href="#swing" data-target="swing">Swing / Big Band</a>
-  <a href="#bebop" data-target="bebop">Bebop</a>
-  <a href="#cool" data-target="cool">Cool &amp; West Coast</a>
-  <a href="#hardbop" data-target="hardbop">Hard Bop</a>
-  <a href="#modal" data-target="modal">Modal Jazz</a>
-  <a href="#free" data-target="free">Free Jazz</a>
-  <a href="#postbop" data-target="postbop">Post-Bop</a>
-  <a href="#fusion" data-target="fusion">Jazz Fusion</a>
-  <a href="#smooth" data-target="smooth">Smooth Jazz</a>
-  <a href="#neotrad" data-target="neotrad">Neo-Traditionalism</a>
-  <a href="#contemporary" data-target="contemporary">Contemporary</a>
-  <a href="#starter" data-target="starter">15-Album Starter Path</a>
+  <a href="#idea" data-target="idea">The Central Idea</a>
 </nav>
 
 <div class="wrap">
-  <h1>A Schematic History of Jazz</h1>
-  <p class="subtitle">An era-by-era map of how jazz evolved, who drove each shift, and the albums worth hearing to understand it. Jazz didn't move in a straight line — styles overlapped, coexisted, and looped back on each other — but this rough chronology is the standard way historians and musicians frame it.</p>
+  <h1>The History of Jazz</h1>
+  <p class="subtitle">A concise guide to the development of jazz, from its African-American and New Orleans roots to contemporary jazz, following Ted Gioia's <em>The History of Jazz</em>, with recordings to hear at each stage.</p>
+
+  <div class="panel lead" id="idea">
+    <h2>The Central Idea</h2>
+    <p class="desc">Jazz is not one fixed style. It is a continuous process in which musicians take existing traditions, challenge their rules, and create something new. Improvisation, individual expression, and interaction between musicians are at the heart of this process.</p>
+  </div>
 
   <!-- Panels and album data are rendered by the script at the bottom from the ERAS array,
        so the markup/content only needs to be edited in one place (the JS data). -->
   <div id="eras"></div>
+
+  <!-- FIVE IDEAS -->
+  <div class="panel" id="ideas">
+    <h2>Five Ideas to Remember</h2>
+    <ol class="ideas">
+      <li><strong>Jazz was born from cultural collision:</strong> African musical traditions, European harmony and instruments, American popular music, and New Orleans culture.</li>
+      <li><strong>Improvisation is central:</strong> jazz is not only a collection of compositions but a tradition of creating music in the moment.</li>
+      <li><strong>Each generation reacts against the previous one:</strong>
+        <div class="lineage">
+          <span>New Orleans</span><i>→</i><span>Swing</span><i>→</i><span>Bebop</span><i>→</i><span>Cool</span><i>→</i><span>Hard Bop</span><i>→</i><span>Modal</span><i>→</i><span>Free</span><i>→</i><span>Fusion</span><i>→</i><span>Contemporary</span>
+        </div>
+      </li>
+      <li><strong>Individual voice matters:</strong> Armstrong, Ellington, Parker, Monk, Coltrane, and Miles sound fundamentally different, and that individuality is part of the tradition.</li>
+      <li><strong>Jazz is also social history:</strong> slavery, segregation, the Great Migration, Harlem, racism, Black culture, recording technology, radio, clubs, civil rights, and globalization all shaped its development.</li>
+    </ol>
+  </div>
+
+  <!-- SUGGESTED LISTENING -->
+  <div class="panel" id="listening">
+    <h2>Suggested Listening While Reading</h2>
+    <p class="desc">One track per stage, to hear the argument rather than just read it.</p>
+    <div class="tracks" id="tracks"></div>
+  </div>
 
   <!-- STARTER PATH -->
   <div class="panel" id="starter">
@@ -182,8 +297,14 @@
     <div class="starter-albums" id="starter-albums"></div>
   </div>
 
+  <!-- FOR A JAZZ MUSICIAN -->
+  <div class="panel lead" id="musician">
+    <h2>For a Jazz Musician</h2>
+    <p class="desc">The most useful way to read Gioia is alongside the recordings. Instead of treating the book as a list of names and dates, listen to the music as the historical argument: hear how rhythm, harmony, ensemble roles, improvisation, and the concept of the individual musician change from one period to the next.</p>
+  </div>
+
   <footer>
-    A note on sourcing: this overview reflects widely agreed-upon jazz-historical consensus (the kind found in standard references like Ted Gioia's <em>The History of Jazz</em> or the Ken Burns <em>Jazz</em> documentary), not a single disputed reading — but as with any genre history, specialists will quibble over emphasis and boundaries between eras.<br>
+    Text summarized from Ted Gioia, <em>The History of Jazz</em>. Date ranges and album picks are added for orientation; as with any genre history, styles overlapped and the boundaries between eras are approximate.<br>
     Album artwork via the iTunes Search API; two albums (the original 1989 <em>Naked City</em> and 2012 <em>Black Radio</em>) aren't in that catalog, so they show as plain tiles instead of a substituted cover.
   </footer>
 </div>
@@ -302,72 +423,124 @@ const emilysdevolution = A("Esperanza Spalding", "Emily's D+Evolution", "2016",
 const mehldauvanguard = A("Brad Mehldau", "Art of the Trio, Vol. 2: Live at the Village Vanguard", "1998",
   "https://is1-ssl.mzstatic.com/image/thumb/Music/6a/dd/02/mzi.cilrlhsv.jpg/400x400bb.jpg", "");
 
-/* Each era: id (matches the sidenav anchors + panel ids), range, title, desc, figures, albums[] */
+const giantsteps = A("John Coltrane", "Giant Steps", "1960",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/4e/2f/8b/4e2f8b1f-7e14-1ce4-1c76-4683b1b9173d/603497847549.jpg/400x400bb.jpg",
+  "Bebop harmony pushed to its limit");
+const favoritethings = A("John Coltrane", "My Favorite Things", "1961",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/38/49/44/384944a8-297f-0844-77da-1ae3b976c457/603497893119.jpg/400x400bb.jpg",
+  "The turn toward modal playing");
+const sidewinder = A("Lee Morgan", "The Sidewinder", "1964",
+  "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/82/57/a2/8257a27a-3267-4acf-b3aa-dfa14109d34f/19UMGIM29898.rgb.jpg/400x400bb.jpg", "");
+
+/* Each era follows a chapter of Gioia's narrative:
+   id (panel id + sidenav anchor), nav (short sidenav label), range, title,
+   desc, figures (optional), albums[] (optional). Some entries are periods,
+   some are portraits of the musicians who redirected the music. */
 const ERAS = [
-  { id: "roots", range: "1890s–1900s", title: "Roots: Blues, Ragtime, and New Orleans",
-    desc: "Jazz emerged in New Orleans around the turn of the 20th century, at the meeting point of African rhythmic traditions, blues, ragtime piano, brass-band marches, and Creole and Caribbean influences. Congo Square, where enslaved and free Black New Orleanians gathered to play music on Sundays, is often cited as a symbolic origin point. No jazz recordings exist from this period — the music was still oral and local — but ragtime (Scott Joplin) and the blues (W.C. Handy) are its direct ancestors and worth hearing to understand what jazz grew out of.",
-    figures: "Scott Joplin, W.C. Handy",
-    albums: [ A("Scott Joplin", "Piano rolls and rags (recorded posthumously by others)", "d. 1917", "", "Joplin died before jazz was captured on record") ] },
+  { id: "africa", nav: "Africa and America", range: "before 1900", title: "Before Jazz: Africa and America",
+    desc: "African musical traditions brought to America contributed strong rhythmic identity, polyrhythm, call-and-response, improvisation, and a social approach to music. In New Orleans these traditions encountered European instruments, harmony, and musical forms, producing a new synthesis." },
 
-  { id: "neworleans", range: "1900s–1920s", title: "New Orleans and Dixieland Jazz",
-    desc: "The first jazz recordings appeared in 1917 (the Original Dixieland Jass Band), but the more historically important figures are Buddy Bolden (unrecorded, but considered the first jazz musician by reputation), Jelly Roll Morton, King Oliver, and above all Louis Armstrong, whose Hot Five and Hot Seven sessions redefined jazz around the soloist rather than collective ensemble playing.",
-    figures: "Buddy Bolden, Jelly Roll Morton, King Oliver, Louis Armstrong",
-    albums: [ hotfives, mortonlibrary, kingoliver ] },
+  { id: "ragtime", nav: "Ragtime", range: "1890s–1910s", title: "Ragtime and the Road to Jazz",
+    desc: "Ragtime, especially the music of Scott Joplin, brought syncopated African-American rhythmic ideas into popular written piano music. Jazz went further by making improvisation and spontaneous interpretation central.",
+    figures: "Scott Joplin",
+    albums: [ A("Scott Joplin (played by Joshua Rifkin)", "Piano Rags", "1970",
+      "https://upload.wikimedia.org/wikipedia/en/8/83/Scott_Joplin_Piano_Rags.jpeg",
+      "Joplin died in 1917, before jazz was recorded; this album sparked the 1970s ragtime revival") ] },
 
-  { id: "swing", range: "1930s–1940s", title: "Swing and the Big Band Era",
-    desc: "Jazz became America's popular dance music. Big bands, tight arrangements, and star soloists defined the sound, and it's the era when jazz was mainstream entertainment rather than a subculture.",
-    figures: "Duke Ellington, Count Basie, Benny Goodman, Fletcher Henderson, Chick Webb, Billie Holiday, Ella Fitzgerald",
+  { id: "neworleans", nav: "New Orleans", range: "1900s–1920s", title: "New Orleans: The Birth of Jazz",
+    desc: "New Orleans brought together African-American, Caribbean, Creole, French, Spanish, and European-American traditions. Brass bands, dances, parades, funerals, and nightlife created an environment where collective improvisation flourished.",
+    figures: "Buddy Bolden, Jelly Roll Morton, King Oliver, Sidney Bechet, Louis Armstrong",
+    albums: [ mortonlibrary, kingoliver ] },
+
+  { id: "armstrong", nav: "Louis Armstrong", range: "1920s", title: "Louis Armstrong Changes Everything",
+    desc: "Armstrong transformed jazz by making the individual soloist central. Jazz increasingly became a music in which listeners recognized the personality and imagination of a particular musician. His rhythmic freedom, melodic invention, swing, and virtuosity established a model for generations.",
+    figures: "Louis Armstrong",
+    albums: [ hotfives ] },
+
+  { id: "jazzage", nav: "The Jazz Age", range: "1920s", title: "Chicago, New York, and the Jazz Age",
+    desc: "Jazz spread north, particularly to Chicago and New York. Prohibition, nightlife, dance halls, recordings, and radio helped turn jazz from a regional African-American musical tradition into a major part of American popular culture." },
+
+  { id: "swing", nav: "Harlem and Swing", range: "1920s–1940s", title: "Harlem and the Swing Era",
+    desc: "Harlem became a major center of African-American cultural life. Duke Ellington, Fletcher Henderson, Bessie Smith, Billie Holiday, and others shaped the period. Big bands led by figures such as Ellington, Count Basie, Benny Goodman, Chick Webb, and Jimmie Lunceford made swing the dominant dance music of the era.",
+    figures: "Duke Ellington, Fletcher Henderson, Bessie Smith, Billie Holiday, Count Basie, Benny Goodman, Chick Webb, Jimmie Lunceford",
     albums: [ ellingtonblanton, basiedecca, ladyday, goodmancarnegie ] },
 
-  { id: "bebop", range: "mid-1940s", title: "Bebop",
-    desc: "A deliberate break from swing: fast tempos, complex harmony, small combos instead of big bands, and improvisation as the whole point rather than a garnish. Born in after-hours jam sessions in Harlem (notably at Minton's Playhouse).",
-    figures: "Charlie Parker, Dizzy Gillespie, Thelonious Monk, Bud Powell, Max Roach",
-    albums: [ parkersavoy, gillespiegroovin, monkgenius ] },
+  { id: "depression", nav: "The Great Depression", range: "1930s", title: "The Great Depression",
+    desc: "The Depression severely damaged the entertainment industry and recording business, but jazz survived through live performance and dance culture. As the economy recovered, jazz entered one of its most important periods." },
 
-  { id: "cool", range: "late 1940s–1950s", title: "Cool Jazz and West Coast Jazz",
-    desc: "A reaction to bebop's intensity: lighter tone, more arrangement, slower tempos, influences from classical music. Centered partly on the West Coast but starting with Miles Davis in New York.",
-    figures: "Miles Davis, Gerry Mulligan, Chet Baker, Dave Brubeck, Lee Konitz",
-    albums: [ birthofcool, timeout, chetsings ] },
+  { id: "bebop", nav: "Bebop", range: "1940s", title: "Bebop: The Revolution",
+    desc: "Charlie Parker and Dizzy Gillespie helped transform jazz from primarily dance-oriented entertainment into a more demanding art music. Bebop was faster, harmonically sophisticated, rhythmically unpredictable, and centered on improvisation. Small clubs increasingly replaced huge dance halls as the ideal setting.",
+    figures: "Charlie Parker, Dizzy Gillespie",
+    albums: [ gillespiegroovin ] },
 
-  { id: "hardbop", range: "1950s", title: "Hard Bop",
-    desc: "Bebop's harder-edged, more blues- and gospel-inflected successor, developed largely on the East Coast as a response to cool jazz's restraint.",
-    figures: "Art Blakey, Horace Silver, Sonny Rollins, Clifford Brown, Max Roach",
-    albums: [ moanin, saxcolossus, brownroach, songformyfather ] },
+  { id: "parker", nav: "Charlie Parker", range: "1940s", title: "Charlie Parker",
+    desc: "Parker transformed jazz improvisation through sophisticated melodic lines, rhythmic ideas, and a new approach to harmony. His vocabulary became foundational for later jazz musicians.",
+    figures: "Charlie Parker",
+    albums: [ parkersavoy ] },
 
-  { id: "modal", range: "late 1950s–1960s", title: "Modal Jazz",
-    desc: "Instead of improvising over dense chord changes, musicians improvised over static scales/modes, opening up more melodic freedom. This era produced the best-selling and most widely recommended jazz album ever made.",
-    figures: "Miles Davis, John Coltrane, Bill Evans",
-    albums: [ kindofblue, lovesupreme, sundayvillage ] },
+  { id: "monk", nav: "Thelonious Monk", range: "1940s–1960s", title: "Thelonious Monk and Individuality",
+    desc: "Monk demonstrated that jazz virtuosity could take many forms. His unusual accents, voicings, silences, repetitions, and angular melodies show Gioia's larger theme: jazz rewards a distinctive individual voice.",
+    figures: "Thelonious Monk",
+    albums: [ monkgenius ] },
 
-  { id: "free", range: "1960s", title: "Free Jazz and the Avant-Garde",
-    desc: "A rejection of fixed chords, tempo, and even conventional tonality, running parallel to the era's social upheaval. Divisive at the time, hugely influential since.",
-    figures: "Ornette Coleman, Cecil Taylor, Albert Ayler, Sun Ra, late-period Coltrane",
-    albums: [ shapeofjazz, freejazz, ascension, unitstructures ] },
+  { id: "cool", nav: "Cool Jazz", range: "late 1940s–1950s", title: "Cool Jazz",
+    desc: "Musicians such as Miles Davis, Lennie Tristano, Lee Konitz, Gerry Mulligan, and Chet Baker developed more restrained and spacious approaches after bebop. Miles Davis became especially important as a musician who repeatedly reinvented jazz.",
+    figures: "Miles Davis, Lennie Tristano, Lee Konitz, Gerry Mulligan, Chet Baker",
+    albums: [ birthofcool, chetsings, timeout ] },
 
-  { id: "postbop", range: "1960s", title: "Post-Bop",
-    desc: "Musicians who kept swing and harmonic sophistication but absorbed modal and free innovations without going fully outside — often described as the most harmonically advanced era of “straight-ahead” jazz.",
-    figures: "Wayne Shorter, Herbie Hancock, the Miles Davis Second Great Quintet (with Shorter, Hancock, Ron Carter, Tony Williams)",
-    albums: [ maidenvoyage, speaknoevil, nefertiti ] },
+  { id: "hardbop", nav: "Hard Bop", range: "1950s–1960s", title: "Hard Bop",
+    desc: "Hard bop brought blues, gospel, and African-American musical roots back into modern jazz while retaining bebop's harmonic sophistication.",
+    figures: "Art Blakey, Horace Silver, Clifford Brown, Sonny Rollins, Lee Morgan",
+    albums: [ moanin, saxcolossus, brownroach, songformyfather, sidewinder ] },
 
-  { id: "fusion", range: "late 1960s–1970s", title: "Jazz Fusion",
-    desc: "Jazz merges with rock, funk, and electric instrumentation. Divisive among purists, foundational for everything that follows in jazz-adjacent popular music.",
-    figures: "Miles Davis, Weather Report, Herbie Hancock, Chick Corea and Return to Forever, Mahavishnu Orchestra",
-    albums: [ bitchesbrew, heavyweather, headhunters, innermounting ] },
+  { id: "miles", nav: "Miles Davis", range: "1940s–1980s", title: "Miles Davis and Constant Reinvention",
+    desc: "Miles Davis's career provides a map of modern jazz: cool jazz, modal jazz, the great quintets, experimentation, and eventually fusion. His importance lies not only in his playing but in his willingness to repeatedly ask what jazz could become next.",
+    figures: "Miles Davis; the Second Great Quintet with Wayne Shorter, Herbie Hancock, Ron Carter, Tony Williams",
+    albums: [ nefertiti, maidenvoyage, speaknoevil ] },
 
-  { id: "smooth", range: "1970s–1980s", title: "Smooth Jazz and Jazz-Funk",
-    desc: "A more commercial, radio-friendly branch of fusion, often criticized by jazz purists as watered down but genuinely popular and technically accomplished.",
-    figures: "Grover Washington Jr., George Benson, Bob James",
-    albums: [ breezin, winelight ] },
+  { id: "modal", nav: "Modal Jazz", range: "late 1950s–1960s", title: "Modal Jazz",
+    desc: "Modal jazz reduced the need for rapidly changing chord progressions and gave improvisers more space around a mode or tonal center. Miles Davis's <em>Kind of Blue</em> is the classic example, with contributions from Bill Evans, John Coltrane, Cannonball Adderley, Paul Chambers, and Jimmy Cobb.",
+    figures: "Miles Davis, Bill Evans, John Coltrane, Cannonball Adderley, Paul Chambers, Jimmy Cobb",
+    albums: [ kindofblue, sundayvillage ] },
 
-  { id: "neotrad", range: "1980s–1990s", title: "Neo-Traditionalism / The Young Lions",
-    desc: "A conscious return to acoustic, pre-fusion jazz values, spearheaded by Wynton Marsalis and institutionalized through Jazz at Lincoln Center. Simultaneously, downtown NYC musicians (John Zorn, the “Knitting Factory” scene) kept the avant-garde alive.",
-    figures: "Wynton Marsalis, Branford Marsalis, John Zorn",
-    albums: [ blackcodes, nakedcity ] },
+  { id: "coltrane", nav: "John Coltrane", range: "1950s–1967", title: "John Coltrane",
+    desc: "Coltrane moved from bebop and hard bop toward modal and spiritual jazz and eventually avant-garde experimentation. <em>Giant Steps</em>, <em>My Favorite Things</em>, and <em>A Love Supreme</em> represent different stages of his search for new possibilities.",
+    figures: "John Coltrane",
+    albums: [ giantsteps, favoritethings, lovesupreme, ascension ] },
 
-  { id: "contemporary", range: "2000s–present", title: "Contemporary Jazz",
-    desc: "No single dominant style — jazz today draws on hip-hop, neo-soul, electronic music, odd-meter grooves, and the entire preceding canon at once, often by musicians who move fluidly between jazz and other genres.",
-    figures: "Kamasi Washington, Robert Glasper, Esperanza Spalding, Brad Mehldau, Christian Scott aTunde Adjuah, Vijay Iyer",
-    albums: [ theepic, blackradio, emilysdevolution, mehldauvanguard ] },
+  { id: "free", nav: "Free Jazz", range: "late 1950s–1960s", title: "Free Jazz",
+    desc: "Ornette Coleman, Cecil Taylor, Albert Ayler, and others questioned conventional harmony, meter, chord progressions, form, and ensemble hierarchy. Free jazz became one of the most controversial and radical developments in the tradition.",
+    figures: "Ornette Coleman, Cecil Taylor, Albert Ayler",
+    albums: [ shapeofjazz, freejazz, unitstructures ] },
+
+  { id: "fusion", nav: "Fusion", range: "late 1960s–1970s", title: "Fusion",
+    desc: "Jazz began absorbing rock and electronic sounds. Miles Davis's <em>Bitches Brew</em> was a major landmark, followed by musicians and groups such as Herbie Hancock, Chick Corea, Weather Report, and Mahavishnu Orchestra.",
+    figures: "Miles Davis, Herbie Hancock, Chick Corea, Weather Report, Mahavishnu Orchestra",
+    albums: [ bitchesbrew, headhunters, innermounting, heavyweather ] },
+
+  { id: "fragments", nav: "Jazz Fragments", range: "1970s onward", title: "Jazz Fragments",
+    desc: "After the 1960s there was no single dominant jazz style. Traditional jazz, bebop revival, hard bop, free jazz, fusion, Latin jazz, avant-garde jazz, smooth jazz, neo-bop, and world jazz developed alongside one another.",
+    albums: [ breezin, winelight, blackcodes, nakedcity ] },
+
+  { id: "institution", nav: "Jazz as Institution", range: "1980s onward", title: "Jazz Becomes an Institution",
+    desc: "Jazz increasingly entered universities, conservatories, and formal education. This helped preserve the tradition but also created a tension: musicians can learn the vocabulary and rules of jazz without necessarily developing a truly individual voice." },
+
+  { id: "today", nav: "Jazz Today", range: "2000s–present", title: "Jazz Today",
+    desc: "Gioia's later chapters describe a jazz world without clear boundaries. Contemporary musicians such as Kamasi Washington and Esperanza Spalding demonstrate that jazz continues to absorb influences and reinvent itself rather than existing as a frozen historical style.",
+    figures: "Kamasi Washington, Esperanza Spalding",
+    albums: [ theepic, emilysdevolution, blackradio, mehldauvanguard ] },
+];
+
+/* Gioia's "suggested listening while reading": one track per stage. */
+const TRACKS = [
+  { style: "New Orleans", name: "West End Blues", by: "Louis Armstrong" },
+  { style: "Swing", name: "One O'Clock Jump", by: "Count Basie" },
+  { style: "Bebop", name: "Ko-Ko", by: "Charlie Parker" },
+  { style: "Hard Bop", name: "Joy Spring", by: "Clifford Brown & Max Roach" },
+  { style: "Cool / Modal", name: "So What", by: "Miles Davis" },
+  { style: "Coltrane", name: "Giant Steps", by: "John Coltrane" },
+  { style: "Free Jazz", name: "Lonely Woman", by: "Ornette Coleman" },
+  { style: "Fusion", name: "Bitches Brew", by: "Miles Davis" },
 ];
 
 const STARTER = [
@@ -393,19 +566,39 @@ function albumCardHtml(al) {
 }
 
 const erasEl = document.getElementById("eras");
-ERAS.forEach(era => {
+ERAS.forEach((era, i) => {
   const panel = document.createElement("div");
   panel.className = "panel";
   panel.id = era.id;
   panel.innerHTML = `
-    <span class="era-range">${era.range}</span>
+    <span class="era-range"><span class="era-num">${i + 1}</span>${era.range}</span>
     <h2>${era.title}</h2>
     <p class="desc">${era.desc}</p>
-    <p class="figures"><span class="label">Key figures</span>${era.figures}</p>
-    <div class="albums">${era.albums.map(al => `<div class="album-card">${albumCardHtml(al)}</div>`).join("")}</div>
+    ${era.figures ? `<p class="figures"><span class="label">Key figures</span>${era.figures}</p>` : ""}
+    ${era.albums ? `<div class="albums">${era.albums.map(al => `<div class="album-card">${albumCardHtml(al)}</div>`).join("")}</div>` : ""}
   `;
   erasEl.appendChild(panel);
 });
+
+// Sidenav: eras first, then the closing sections. Built before nav.js's
+// scroll-spy runs on DOMContentLoaded, so the links are picked up like static ones.
+const navEl = document.getElementById("sidenav");
+[...ERAS, { id: "ideas", nav: "Five Ideas" }, { id: "listening", nav: "Suggested Listening" },
+ { id: "starter", nav: "15-Album Starter Path" }, { id: "musician", nav: "For a Jazz Musician" }]
+  .forEach(s => {
+    const a = document.createElement("a");
+    a.href = `#${s.id}`;
+    a.dataset.target = s.id;
+    a.textContent = s.nav;
+    navEl.appendChild(a);
+  });
+
+document.getElementById("tracks").innerHTML = TRACKS.map(t => `
+  <div class="track">
+    <div class="style">${t.style}</div>
+    <div class="name">${t.name}</div>
+    <div class="by">${t.by}</div>
+  </div>`).join("");
 
 const starterEl = document.getElementById("starter-albums");
 STARTER.forEach((al, i) => {
